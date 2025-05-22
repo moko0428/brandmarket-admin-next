@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black',
     title: '브랜드마켓 관리자 패널',
   },
   applicationName: '브랜드마켓 관리자 패널',

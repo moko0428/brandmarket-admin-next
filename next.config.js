@@ -7,7 +7,6 @@ const withPWA = nextPWA({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  swcMinify: true,
 });
 
 /** @type {import('next').NextConfig} */
