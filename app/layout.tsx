@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: '브랜드마켓 관리자 패널',
   description: '브랜드마켓 관리자 패널',
   manifest: '/manifest.json',
-  themeColor: '#000000',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black',
@@ -36,6 +35,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: '#000000',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,9 +47,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
-        {children}
+        <div className="mx-auto max-w-2xl h-screen border-x border-x-neutral-100 px-4 py-10">
+          {children}
+        </div>
       </body>
     </html>
   );
