@@ -2,7 +2,7 @@
   "name": "brandmarket-admin",
   "short_name": "bm-admin",
   "description": "brandmarket-admin-page",
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
