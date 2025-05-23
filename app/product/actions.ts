@@ -22,7 +22,7 @@ export async function detectText(base64Image: string | null) {
     return {
       success: true,
       text: fullText,
-      detections: detections,
+      detections,
     };
   } catch (error) {
     console.error('텍스트 감지 오류:', error);

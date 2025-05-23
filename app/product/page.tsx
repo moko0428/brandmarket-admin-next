@@ -30,17 +30,17 @@ export default function ProductPage() {
   const handleCapture = (imageData: string) => {
     setCapturedImage(imageData);
     setShowCamera(false);
-
-    analyzeImage();
   };
 
+  const analyzeText = () => {
+    analyzeImage();
+  };
   const analyzeImage = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
       const result = await detectText(visionApiReady);
-      console.log('result', visionApiReady);
 
       if (result.success && result.text && result.detections) {
         setTextResult({
@@ -65,12 +65,20 @@ export default function ProductPage() {
       <h1 className="text-2xl font-bold mb-6">텍스트 인식</h1>
 
       {!showCamera && !isLoading && (
-        <button
-          onClick={() => setShowCamera(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors"
-        >
-          카메라 열기
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setShowCamera(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors"
+          >
+            카메라 열기
+          </button>
+          <button
+            onClick={analyzeText}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors"
+          >
+            텍스트 분석
+          </button>
+        </div>
       )}
 
       {isLoading && (
