@@ -7,12 +7,24 @@ import { visionApiReadyImageAtom } from './atoms/camera-atom';
 import { detectText } from './actions';
 import Image from 'next/image';
 
-type TextResult = {
+interface ReceiptItem {
+  name: string;
+  price: number;
+  quantity?: number;
+}
+
+interface ReceiptData {
+  storeName: string;
+  date: string;
+  items: ReceiptItem[];
+  totalAmount: number;
+  taxAmount?: number;
+}
+
+interface TextResult {
   text: string;
-  detections: {
-    description: string | null | undefined;
-  }[];
-};
+  parsedData: ReceiptData;
+}
 
 interface TextDetectionError extends Error {
   message: string;
@@ -42,12 +54,10 @@ export default function ProductPage() {
     try {
       const result = await detectText(visionApiReady);
 
-      if (result.success && result.text && result.detections) {
+      if (result.success && result.text && result.parsedData) {
         setTextResult({
           text: result.text,
-          detections: result.detections.map((d) => ({
-            description: d.description,
-          })),
+          parsedData: result.parsedData,
         });
       } else {
         setError(result.error || '알 수 없는 오류가 발생했습니다');
@@ -120,31 +130,52 @@ export default function ProductPage() {
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-medium mb-2">인식된 텍스트</h3>
-              {textResult.text ? (
+              <h3 className="text-lg font-medium mb-2">영수증 정보</h3>
+              {textResult.parsedData ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="font-medium">매장명:</p>
+                    <p>{textResult.parsedData.storeName}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">날짜:</p>
+                    <p>{textResult.parsedData.date}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">상품 목록:</p>
+                    <ul className="list-disc pl-5">
+                      {textResult.parsedData.items.map((item, index) => (
+                        <li key={index}>
+                          {item.name} - {item.price.toLocaleString()}원
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium">총액:</p>
+                    <p>
+                      {textResult.parsedData.totalAmount.toLocaleString()}원
+                    </p>
+                  </div>
+                  {textResult.parsedData.taxAmount && (
+                    <div>
+                      <p className="font-medium">세금:</p>
+                      <p>
+                        {textResult.parsedData.taxAmount.toLocaleString()}원
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p>인식된 정보가 없습니다.</p>
+              )}
+
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">전체 텍스트</h4>
                 <div className="p-3 bg-white rounded shadow-sm">
                   <p className="whitespace-pre-line">{textResult.text}</p>
                 </div>
-              ) : (
-                <p>인식된 텍스트가 없습니다.</p>
-              )}
-
-              {textResult.detections && textResult.detections.length > 1 && (
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">개별 텍스트 요소</h4>
-                  <ul className="list-disc pl-5">
-                    {textResult.detections
-                      .slice(1)
-                      .map(
-                        (item: TextResult['detections'][0], index: number) => (
-                          <li key={index} className="mb-1">
-                            {item.description}
-                          </li>
-                        )
-                      )}
-                  </ul>
-                </div>
-              )}
+              </div>
             </div>
           </div>
 
