@@ -1,20 +1,10 @@
+// app/product/actions.ts
+
 'use server';
 
 import { googleVisionClient } from '@/libs/google-vision';
 
-interface ReceiptItem {
-  name: string;
-  price: number;
-  quantity?: number;
-}
-
-interface ReceiptData {
-  storeName: string;
-  date: string;
-  items: ReceiptItem[];
-  totalAmount: number;
-  taxAmount?: number;
-}
+import { ReceiptDataType } from './types/receipt-type';
 
 export async function detectText(base64Image: string | null) {
   try {
@@ -25,9 +15,11 @@ export async function detectText(base64Image: string | null) {
       };
     }
 
-    const [result] = await googleVisionClient.documentTextDetection(
-      Buffer.from(base64Image, 'base64')
-    );
+    const [result] = await googleVisionClient.documentTextDetection({
+      image: {
+        content: base64Image, // data:image/... 제외한 순수 base64
+      },
+    });
 
     const fullText = result.fullTextAnnotation?.text || '';
 
@@ -48,65 +40,106 @@ export async function detectText(base64Image: string | null) {
   }
 }
 
-function parseReceiptText(text: string): ReceiptData {
+function parseReceiptText(text: string): ReceiptDataType {
   const lines = text.split('\n');
-  const receiptData: ReceiptData = {
+  const receiptData: ReceiptDataType = {
     storeName: '',
-    date: '',
     items: [],
-    totalAmount: 0,
   };
 
-  // 가격 패턴 (숫자 + 원 또는 , 포함)
-  const pricePattern = /(\d{1,3}(,\d{3})*원|\d{1,3}(,\d{3})*)/;
-
-  // 날짜 패턴 (YYYY-MM-DD 또는 YYYY/MM/DD)
-  const datePattern = /\d{4}[-/]\d{2}[-/]\d{2}/;
-
-  lines.forEach((line) => {
-    // 매장명 찾기 (첫 번째 줄 또는 특정 패턴)
-    if (!receiptData.storeName && line.trim()) {
-      receiptData.storeName = line.trim();
-    }
-
-    // 날짜 찾기
-    const dateMatch = line.match(datePattern);
-    if (dateMatch) {
-      receiptData.date = dateMatch[0];
-    }
-
-    // 상품 항목 찾기
-    const priceMatch = line.match(pricePattern);
-    if (priceMatch) {
-      const price = parseInt(priceMatch[0].replace(/[^0-9]/g, ''));
-      const itemName = line.split(priceMatch[0])[0].trim();
-
-      if (itemName && price) {
-        receiptData.items.push({
-          name: itemName,
-          price: price,
-        });
-      }
-    }
-
-    // 총액 찾기
-    if (line.includes('합계') || line.includes('총액')) {
-      const totalMatch = line.match(pricePattern);
-      if (totalMatch) {
-        receiptData.totalAmount = parseInt(
-          totalMatch[0].replace(/[^0-9]/g, '')
-        );
-      }
-    }
-
-    // 세금 찾기
-    if (line.includes('부가세') || line.includes('VAT')) {
-      const taxMatch = line.match(pricePattern);
-      if (taxMatch) {
-        receiptData.taxAmount = parseInt(taxMatch[0].replace(/[^0-9]/g, ''));
-      }
-    }
+  console.log('=== 전체 텍스트 라인 ===');
+  lines.forEach((line, index) => {
+    console.log(`Line ${index + 1}: "${line}"`);
   });
 
+  // 거래처명 추출
+  if (lines.length > 0) {
+    receiptData.storeName = lines[0].trim();
+    console.log('\n=== 거래처명 ===');
+    console.log(`Store Name: "${receiptData.storeName}"`);
+  }
+
+  // 품목 라인 찾기
+  let startItemLine = lines.length;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('품')) {
+      startItemLine = i + 1;
+      console.log('\n=== 품목 시작 라인 찾음 ===');
+      console.log(`품목 시작 라인 번호: ${startItemLine + 1}`);
+      break;
+    }
+  }
+
+  console.log('\n=== 품목 파싱 시작 ===');
+  // 품목 데이터 파싱
+  for (let i = startItemLine; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      console.log(`Line ${i + 1}: 빈 라인 스킵`);
+      continue;
+    }
+
+    console.log(`\n--- 라인 ${i + 1} 파싱 시작 ---`);
+    console.log(`원본 라인: "${line}"`);
+
+    // 라인 분할
+    const parts = line.split(/\s+/);
+    console.log('분할된 부분들:', parts);
+
+    if (parts.length < 4) {
+      console.log('데이터 부족: 최소 4개 부분 필요');
+      continue;
+    }
+
+    // 끝에서부터 숫자 형식 확인
+    const lastThreeParts = parts.slice(-3);
+    const remainingParts = parts.slice(0, -3);
+
+    console.log('마지막 3개 부분:', lastThreeParts);
+    console.log('나머지 부분:', remainingParts);
+
+    // 파싱 시도
+    const totalPrice = parseNumberWithCommas(lastThreeParts[2]);
+    const quantity = parseFloat(lastThreeParts[1]);
+    const price = parseNumberWithCommas(lastThreeParts[0]);
+    const itemName = remainingParts.join(' ').trim();
+
+    console.log('파싱 결과:');
+    console.log(`- 품명: "${itemName}"`);
+    console.log(`- 단가: ${price}`);
+    console.log(`- 수량: ${quantity}`);
+    console.log(`- 금액: ${totalPrice}`);
+
+    // 유효성 검사
+    const isValid =
+      itemName &&
+      !isNaN(price) &&
+      !isNaN(quantity) &&
+      !isNaN(totalPrice) &&
+      Math.abs(price * quantity - totalPrice) < 1;
+
+    console.log('유효성 검사:', isValid ? '성공' : '실패');
+
+    if (isValid) {
+      receiptData.items.push({
+        name: itemName,
+        price: price,
+        quantity: quantity,
+        totalPrice: totalPrice,
+      });
+      console.log('아이템 추가됨');
+    }
+  }
+
+  console.log('\n=== 최종 파싱 결과 ===');
+  console.log(JSON.stringify(receiptData, null, 2));
+
   return receiptData;
+}
+
+// 천 단위 구분자가 있는 숫자 파싱
+function parseNumberWithCommas(str: string): number {
+  const parsed = parseInt(str.replace(/[^\d]/g, ''));
+  console.log(`숫자 파싱: "${str}" -> ${parsed}`);
+  return parsed;
 }

@@ -6,24 +6,11 @@ import Camera from './components/camera';
 import { visionApiReadyImageAtom } from './atoms/camera-atom';
 import { detectText } from './actions';
 import Image from 'next/image';
-
-interface ReceiptItem {
-  name: string;
-  price: number;
-  quantity?: number;
-}
-
-interface ReceiptData {
-  storeName: string;
-  date: string;
-  items: ReceiptItem[];
-  totalAmount: number;
-  taxAmount?: number;
-}
+import { ReceiptDataType } from './types/receipt-type';
 
 interface TextResult {
-  text: string;
-  parsedData: ReceiptData;
+  parsedData?: ReceiptDataType;
+  text?: string;
 }
 
 interface TextDetectionError extends Error {
@@ -137,44 +124,35 @@ export default function ProductPage() {
                     <p className="font-medium">매장명:</p>
                     <p>{textResult.parsedData.storeName}</p>
                   </div>
-                  <div>
-                    <p className="font-medium">날짜:</p>
-                    <p>{textResult.parsedData.date}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">상품 목록:</p>
-                    <ul className="list-disc pl-5">
+
+                  <table className="min-w-full bg-white">
+                    <thead>
+                      <tr>
+                        <th className="py-2">품명</th>
+                        <th className="py-2">단가</th>
+                        <th className="py-2">수량</th>
+                        <th className="py-2">금액</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {textResult.parsedData.items.map((item, index) => (
-                        <li key={index}>
-                          {item.name} - {item.price.toLocaleString()}원
-                        </li>
+                        <tr key={index} className="border-t">
+                          <td className="py-2">{item.name}</td>
+                          <td className="py-2">{item.price}</td>
+                          <td className="py-2">{item.quantity}</td>
+                          <td className="py-2">{item.totalPrice}</td>
+                        </tr>
                       ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-medium">총액:</p>
-                    <p>
-                      {textResult.parsedData.totalAmount.toLocaleString()}원
-                    </p>
-                  </div>
-                  {textResult.parsedData.taxAmount && (
-                    <div>
-                      <p className="font-medium">세금:</p>
-                      <p>
-                        {textResult.parsedData.taxAmount.toLocaleString()}원
-                      </p>
-                    </div>
-                  )}
+                    </tbody>
+                  </table>
                 </div>
               ) : (
                 <p>인식된 정보가 없습니다.</p>
               )}
 
-              <div className="mt-4">
-                <h4 className="font-medium mb-2">전체 텍스트</h4>
-                <div className="p-3 bg-white rounded shadow-sm">
-                  <p className="whitespace-pre-line">{textResult.text}</p>
-                </div>
+              <div>
+                전체 텍스트
+                {textResult?.text}
               </div>
             </div>
           </div>
