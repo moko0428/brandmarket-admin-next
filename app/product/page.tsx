@@ -7,7 +7,8 @@ import { visionApiReadyImageAtom } from './atoms/camera-atom';
 import { detectText } from './actions';
 import Image from 'next/image';
 import { ReceiptDataType } from './types/receipt-type';
-
+import { ocrResultAtom, editableReceiptAtom } from './atoms/camera-atom';
+import { ReceiptEditor } from './components/receipt-editor';
 interface TextResult {
   parsedData?: ReceiptDataType;
   text?: string;
@@ -17,7 +18,7 @@ interface TextDetectionError extends Error {
   message: string;
 }
 
-export default function ProductPage() {
+export default function ReceiptPage() {
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [textResult, setTextResult] = useState<TextResult | null>(null);
@@ -25,6 +26,8 @@ export default function ProductPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [visionApiReady] = useAtom(visionApiReadyImageAtom);
+  const [, setOcrResult] = useAtom(ocrResultAtom);
+  const [, setEditableReceipt] = useAtom(editableReceiptAtom);
 
   const handleCapture = (imageData: string) => {
     setCapturedImage(imageData);
@@ -46,6 +49,11 @@ export default function ProductPage() {
           text: result.text,
           parsedData: result.parsedData,
         });
+        setOcrResult({
+          rawText: result.text,
+          parsedData: result.parsedData,
+        });
+        setEditableReceipt(result.parsedData);
       } else {
         setError(result.error || '알 수 없는 오류가 발생했습니다');
       }
@@ -154,6 +162,14 @@ export default function ProductPage() {
                 전체 텍스트
                 {textResult?.text}
               </div>
+              <div>
+                추출된 텍스트
+                {textResult?.parsedData?.items.map((item) => (
+                  <div key={item.name}>
+                    {item.name} {item.price} {item.quantity} {item.totalPrice}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -165,6 +181,8 @@ export default function ProductPage() {
           </button>
         </div>
       )}
+
+      <ReceiptEditor />
     </div>
   );
 }

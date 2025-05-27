@@ -20,7 +20,7 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string>('');
   const [cameraActive, setCameraActive] = useState(false);
-  const [isPWAInstalled, setIsPWAInstalled] = useState(false);
+  const [, setIsPWAInstalled] = useState(false);
 
   const [, setCameraImageBase64] = useAtom(cameraImageBase64WritableAtom);
 
@@ -43,8 +43,8 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
       const constraints = {
         video: {
           facingMode: 'environment',
-          width: { ideal: 320 },
-          height: { ideal: 240 },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
         },
         audio: false,
       };
@@ -99,19 +99,13 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
 
   return (
     <div className="max-w-lg w-full mx-auto">
-      {!isPWAInstalled && (
-        <div className="absolute top-0 left-0 right-0 text-center bg-orange-500 bg-opacity-90 text-black py-2 text-sm z-[1001]">
-          최상의 카메라 경험을 위해 앱을 홈 화면에 설치하세요.
-        </div>
-      )}
-
       {error && (
         <div className="absolute top-5 left-0 right-0 text-center bg-red-600 bg-opacity-70 text-white py-2.5 z-[1001]">
           {error}
         </div>
       )}
 
-      <div className="flex justify-center items-center overflow-hidden">
+      <div className="flex h-[700px] overflow-hidden">
         <video
           ref={videoRef}
           autoPlay

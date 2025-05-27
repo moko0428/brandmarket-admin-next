@@ -1,6 +1,17 @@
 import { atom } from 'jotai';
+import { ReceiptDataType } from '../types/receipt-type';
 
 export const cameraImageBase64Atom = atom<string | null>(null);
+
+export const ocrResultAtom = atom<{
+  rawText: string;
+  parsedData: ReceiptDataType;
+} | null>(null);
+
+export const editableReceiptAtom = atom<ReceiptDataType>({
+  storeName: '',
+  items: [],
+});
 
 export const cameraImageBase64WritableAtom = atom(
   (get) => get(cameraImageBase64Atom),
