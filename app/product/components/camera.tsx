@@ -118,7 +118,7 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
 
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="flex justify-around py-5 px-5 bg-black bg-opacity-70">
+      <div className="absolute bottom-1/5 left-0 right-0 flex justify-center gap-5 py-5 px-5 bg-black bg-opacity-70">
         <button
           onClick={captureImage}
           disabled={!cameraActive}
