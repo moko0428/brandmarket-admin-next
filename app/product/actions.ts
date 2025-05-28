@@ -2,7 +2,13 @@
 
 import { googleVisionClient } from '@/libs/google-vision';
 
-import { ReceiptDataType } from './types/receipt-type';
+import { ReceiptDataType, ReceiptItemType } from './types/receipt-type';
+
+import {
+  ITEM_NAME_PATTERN,
+  PRICE_PATTERN,
+  QUANTITY_PATTERN,
+} from './patterns/receiptPattern';
 
 export async function detectText(base64Image: string | null) {
   try {
@@ -43,130 +49,115 @@ function parseReceiptText(text: string): ReceiptDataType {
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line);
+
   const receiptData: ReceiptDataType = {
     storeName: '',
     items: [],
   };
 
-  console.log('=== 전체 텍스트 라인 ===');
-  lines.forEach((line, index) => {
-    console.log(`Line ${index + 1}: "${line}"`);
-  });
+  console.log('\n=== 파싱 시작 ===');
+  console.log('전체 라인 수:', lines.length);
+  console.log('입력된 라인들:', lines);
 
-  // 키워드로 시작하는 라인 찾기
-  let startIndex = -1;
+  let currentItem: Partial<ReceiptItemType> = {};
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    if (line.match(/^(품|단|수|금)/)) {
-      startIndex = i + 1;
-      console.log('\n=== 키워드 라인 발견 ===');
-      console.log(`키워드 라인: "${line}"`);
-      console.log(`시작 인덱스: ${startIndex}`);
-      break;
-    }
-  }
-
-  // 키워드 이후 라인만 추출
-  const newLines = startIndex !== -1 ? lines.slice(startIndex) : [];
-
-  console.log('\n=== 추출된 라인들 ===');
-  newLines.forEach((line, index) => {
-    console.log(`NewLine ${index + 1}: "${line}"`);
-  });
-
-  // 첫 번째 라인은 거래처명으로 설정
-  if (lines.length > 0) {
-    receiptData.storeName = lines[0];
-    console.log('\n=== 거래처명 ===');
-    console.log(`Store Name: "${receiptData.storeName}"`);
-  }
-
-  // 추출된 라인들에 대해서만 파싱 진행
-  for (let i = 0; i < newLines.length; i++) {
-    const line = newLines[i].trim();
     console.log(`\n--- 라인 ${i + 1} 파싱 시작 ---`);
     console.log(`원본 라인: "${line}"`);
 
-    // 숫자가 포함된 라인만 처리
-    if (!line.match(/\d+/)) {
-      console.log('숫자가 없는 라인 스킵');
+    // 품명 패턴 검사
+    if (ITEM_NAME_PATTERN.test(line) && !PRICE_PATTERN.test(line)) {
+      // 이전 아이템이 있다면 저장
+      if (currentItem.name) {
+        console.log('\n>>> 이전 아이템 저장 <<<');
+        tryAddItem(currentItem, receiptData);
+      }
+
+      // 새 아이템 시작
+      currentItem = {
+        name: line,
+        price: 1,
+        quantity: 1,
+        totalPrice: 1,
+      };
+      console.log('새 품명 설정됨:', currentItem);
       continue;
     }
 
-    // 라인 분할 - 공백, 탭 등으로 분리
-    const parts = line.split(/[\s\t]+/);
-    console.log('분할된 부분들:', parts);
+    // 단가 패턴 검사
+    if (PRICE_PATTERN.test(line) && currentItem.name) {
+      currentItem.price = parseNumberWithCommas(line);
+      currentItem.totalPrice = currentItem.price * (currentItem.quantity || 1);
+      console.log('단가 설정됨:', currentItem);
+      continue;
+    }
 
-    // 끝에서부터 숫자 찾기
-    const numberParts: string[] = [];
-    const nameParts: string[] = [];
-
-    for (let j = parts.length - 1; j >= 0; j--) {
-      // 숫자 또는 쉼표를 포함하는 부분 찾기
-      if (parts[j].match(/[\d,]+/) && numberParts.length < 3) {
-        numberParts.unshift(parts[j]);
-      } else {
-        nameParts.push(parts[j]);
+    // 수량 패턴 검사
+    if (QUANTITY_PATTERN.test(line) && currentItem.name) {
+      currentItem.quantity = parseFloat(line);
+      if (currentItem.price) {
+        currentItem.totalPrice = currentItem.price * currentItem.quantity;
       }
+      console.log('수량 설정됨:', currentItem);
+      continue;
     }
 
-    console.log('숫자 부분:', numberParts);
-    console.log('이름 부분:', nameParts);
+    // 총액 패턴 검사
+    if (PRICE_PATTERN.test(line) && currentItem.name) {
+      currentItem.totalPrice = parseNumberWithCommas(line);
+      // 단가가 없으면 총액/수량으로 계산
+      if (!currentItem.price && currentItem.quantity) {
+        currentItem.price = Math.round(
+          currentItem.totalPrice / currentItem.quantity
+        );
+      }
+      console.log('총액 설정됨:', currentItem);
 
-    // 파싱 시도
-    let totalPrice, quantity, price;
-
-    if (numberParts.length >= 3) {
-      totalPrice = parseNumberWithCommas(numberParts[2]);
-      quantity = parseFloat(numberParts[1]);
-      price = parseNumberWithCommas(numberParts[0]);
-    } else if (numberParts.length === 2) {
-      totalPrice = parseNumberWithCommas(numberParts[1]);
-      quantity = 1;
-      price = parseNumberWithCommas(numberParts[0]);
-    } else if (numberParts.length === 1) {
-      totalPrice = parseNumberWithCommas(numberParts[0]);
-      quantity = 1;
-      price = totalPrice;
-    }
-
-    const itemName = nameParts.join(' ').trim();
-
-    console.log('파싱 결과:');
-    console.log(`- 품명: "${itemName}"`);
-    console.log(`- 단가: ${price}`);
-    console.log(`- 수량: ${quantity}`);
-    console.log(`- 금액: ${totalPrice}`);
-
-    // 유효성 검사
-    const isValid =
-      itemName &&
-      price !== undefined &&
-      quantity !== undefined &&
-      totalPrice !== undefined &&
-      price > 0 &&
-      totalPrice > 0;
-
-    console.log('유효성 검사:', isValid ? '성공' : '실패');
-
-    if (isValid) {
-      receiptData.items.push({
-        name: itemName,
-        price: price ?? 0,
-        quantity: quantity ?? 0,
-        totalPrice: totalPrice ?? 0,
-      });
-      console.log('아이템 추가됨');
+      // 아이템 저장 후 초기화
+      tryAddItem(currentItem, receiptData);
+      currentItem = {};
     }
   }
 
+  // 마지막 아이템 처리
+  if (currentItem.name) {
+    console.log('\n>>> 마지막 아이템 저장 <<<');
+    tryAddItem(currentItem, receiptData);
+  }
+
   console.log('\n=== 최종 파싱 결과 ===');
-  console.log(JSON.stringify(receiptData, null, 2));
+  console.log('총 아이템 수:', receiptData.items.length);
+  receiptData.items.forEach((item, index) => {
+    console.log(`\n아이템 #${index + 1}:`);
+    console.log('- 품명:', item.name);
+    console.log('- 단가:', item.price.toLocaleString());
+    console.log('- 수량:', item.quantity);
+    console.log('- 금액:', item.totalPrice.toLocaleString());
+  });
 
   return receiptData;
 }
 
-// 천 단위 구분자가 있는 숫자 파싱
+function tryAddItem(
+  item: Partial<ReceiptItemType>,
+  receiptData: ReceiptDataType
+) {
+  console.log('\n>>> 아이템 추가 시도 <<<');
+  console.log('추가할 아이템:', item);
+
+  const completeItem = {
+    name: item.name || '상품명 없음',
+    price: item.price || 1,
+    quantity: item.quantity || 1,
+    totalPrice: item.totalPrice || item.price || 1,
+  };
+
+  console.log('기본값 설정 후:', completeItem);
+  receiptData.items.push(completeItem);
+  console.log('✅ 아이템 추가됨');
+}
+
 function parseNumberWithCommas(str: string): number {
   const parsed = parseInt(str.replace(/[^\d]/g, ''));
   console.log(`숫자 파싱: "${str}" -> ${parsed}`);
