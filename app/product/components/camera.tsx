@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { cameraImageBase64WritableAtom } from '../atoms/camera-atom';
 
@@ -17,35 +17,27 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 상태 관리
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string>('');
   const [cameraActive, setCameraActive] = useState(false);
   const [, setIsPWAInstalled] = useState(false);
   const [, setCameraImageBase64] = useAtom(cameraImageBase64WritableAtom);
 
-  // 컴포넌트 마운트 시 카메라 초기화
-  useEffect(() => {
-    // PWA 설치 여부 확인
-    setIsPWAInstalled(
-      window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as SafariNavigator).standalone ||
-        document.referrer.includes('android-app://')
-    );
-
-    startCamera();
-
-    // 컴포넌트 언마운트 시 카메라 종료
-    return () => {
-      stopCamera();
-    };
-  }, []);
+  const stopCamera = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+      setCameraActive(false);
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    }
+  }, [stream]);
 
   const startCamera = async () => {
     try {
       const constraints = {
         video: {
-          // 카메라 방향(후면), 해상도 설정
           facingMode: 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 },
@@ -69,19 +61,20 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
     }
   };
 
-  // 모든 트랙 정지, 상태 초기화
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-      setCameraActive(false);
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-    }
-  };
+  useEffect(() => {
+    setIsPWAInstalled(
+      window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as SafariNavigator).standalone ||
+        document.referrer.includes('android-app://')
+    );
 
-  // 현재 비디오 프레임을 캔버스에 그림, base64 형식으로 이미지 변환, 상태 업데이트 및 콜백 호출
+    startCamera();
+
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
   const captureImage = () => {
     if (videoRef.current && canvasRef.current && cameraActive) {
       const video = videoRef.current;
@@ -94,7 +87,6 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
       context?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const imageData = canvas.toDataURL('image/jpeg');
-
       setCameraImageBase64(imageData);
 
       if (onCapture) {
@@ -111,7 +103,6 @@ export default function Camera({ onCapture, onClose }: CameraProps) {
         </div>
       )}
 
-      {/* 카메라 비디오 플레이어 */}
       <div className="flex h-[700px] overflow-hidden">
         <video
           ref={videoRef}
