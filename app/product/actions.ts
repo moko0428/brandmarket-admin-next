@@ -1,6 +1,6 @@
 'use server';
 
-import { googleVisionClient } from '@/libs/google-vision';
+import { googleVisionClient } from '@/lib/google-vision';
 
 import { ReceiptDataType, ReceiptItemType } from './types/receipt-type';
 

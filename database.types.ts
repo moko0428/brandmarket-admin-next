@@ -9,20 +9,183 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      test: {
+      manager_permissions: {
         Row: {
-          id: number
-          name: string | null
+          assigned_stores: string[] | null
+          can_edit_products: boolean
+          can_manage_inventory: boolean
+          can_view_reports: boolean
+          created_at: string
+          profile_id: string
+          updated_at: string
         }
         Insert: {
-          id?: never
-          name?: string | null
+          assigned_stores?: string[] | null
+          can_edit_products?: boolean
+          can_manage_inventory?: boolean
+          can_view_reports?: boolean
+          created_at?: string
+          profile_id: string
+          updated_at?: string
         }
         Update: {
-          id?: never
-          name?: string | null
+          assigned_stores?: string[] | null
+          can_edit_products?: boolean
+          can_manage_inventory?: boolean
+          can_view_reports?: boolean
+          created_at?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_permissions_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar: string | null
+          createdAt: string
+          is_active: boolean
+          last_login: string | null
+          name: string
+          profile_id: string
+          role: Database["public"]["Enums"]["role"]
+          storename: string
+          updatedAt: string
+        }
+        Insert: {
+          avatar?: string | null
+          createdAt?: string
+          is_active?: boolean
+          last_login?: string | null
+          name: string
+          profile_id: string
+          role?: Database["public"]["Enums"]["role"]
+          storename: string
+          updatedAt?: string
+        }
+        Update: {
+          avatar?: string | null
+          createdAt?: string
+          is_active?: boolean
+          last_login?: string | null
+          name?: string
+          profile_id?: string
+          role?: Database["public"]["Enums"]["role"]
+          storename?: string
+          updatedAt?: string
         }
         Relationships: []
+      }
+      receipt_items: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          price: number
+          quantity: number
+          receipt_id: number
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          name: string
+          price: number
+          quantity: number
+          receipt_id: number
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          name?: string
+          price?: number
+          quantity?: number
+          receipt_id?: number
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_items_receipt_id_receipts_id_fk"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipts: {
+        Row: {
+          created_at: string
+          id: number
+          store_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          store_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      role_change_logs: {
+        Row: {
+          changed_by: string
+          created_at: string
+          id: string
+          profile_id: string
+          role: Database["public"]["Enums"]["role"]
+          role_change_type: Database["public"]["Enums"]["role_change_type"]
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          role: Database["public"]["Enums"]["role"]
+          role_change_type: Database["public"]["Enums"]["role_change_type"]
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          role?: Database["public"]["Enums"]["role"]
+          role_change_type?: Database["public"]["Enums"]["role_change_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_change_logs_changed_by_profiles_profile_id_fk"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "role_change_logs_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
       }
     }
     Views: {
@@ -32,7 +195,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      role: "admin" | "manager" | "user"
+      role_change_type: "promotion" | "demotion" | "initial"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -147,6 +311,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      role: ["admin", "manager", "user"],
+      role_change_type: ["promotion", "demotion", "initial"],
+    },
   },
 } as const
