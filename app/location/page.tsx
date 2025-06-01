@@ -93,6 +93,7 @@ export default function LocationPage() {
             <Input
               id="search-map"
               value={value}
+              onChange={(e) => setValue(e.target.value)}
               placeholder="위치 검색"
               className="bg-white w-2/3"
             />
