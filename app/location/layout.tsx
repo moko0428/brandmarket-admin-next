@@ -12,7 +12,7 @@ export default function LocationLayout({
 }) {
   return (
     <>
-      <div className="p-4">{children}</div>
+      <div className="py-0 md:py-4 px-0">{children}</div>
     </>
   );
 }

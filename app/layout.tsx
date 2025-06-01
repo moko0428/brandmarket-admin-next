@@ -1,16 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import Navigation from '@/common/components/navigation';
 
 export const metadata: Metadata = {
   title: '브랜드마켓 관리자 패널',
@@ -41,17 +31,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ko">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
-      >
-        <div className="mx-auto max-w-2xl h-screen border-x border-x-neutral-100 px-4 py-10">
-          {children}
-        </div>
+      <body suppressHydrationWarning>
+        <Navigation />
+        <div className="border-x-neutral-100">{children}</div>
       </body>
     </html>
   );

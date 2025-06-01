@@ -5,10 +5,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from './components/ui/navigation-menu';
+} from './ui/navigation-menu';
 import { cn } from '@/lib/utils';
 
 const menus = [
+  {
+    name: 'Home',
+    href: '/',
+  },
   {
     name: 'Inventory',
     href: '/product',
@@ -17,11 +21,15 @@ const menus = [
     name: 'Location',
     href: '/location',
   },
+  {
+    name: 'Profile',
+    href: '/users',
+  },
 ];
 
 export default function Navigation() {
   return (
-    <NavigationMenu>
+    <NavigationMenu className="hidden md:block">
       <NavigationMenuList>
         {menus.map((menu) => (
           <NavigationMenuItem key={menu.name}>
