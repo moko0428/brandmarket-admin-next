@@ -435,7 +435,7 @@ export default function LocationPage() {
       </div>
 
       <div className="col-span-1 space-y-4 px-4 md:block hidden">
-        <h2>브랜드 마켓 매장 찾기</h2>
+        <h2 className="text-2xl font-bold">브랜드 마켓 매장 찾기</h2>
 
         {/* 검색 창 */}
         <InputPair

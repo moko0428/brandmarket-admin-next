@@ -13,18 +13,18 @@ const menus = [
     name: 'Home',
     href: '/',
   },
-  {
-    name: 'Inventory',
-    href: '/product',
-  },
+  // {
+  //   name: 'Inventory',
+  //   href: '/product',
+  // },
   {
     name: 'Location',
     href: '/location',
   },
-  {
-    name: 'Profile',
-    href: '/users',
-  },
+  // {
+  //   name: 'Profile',
+  //   href: '/users',
+  // },
 ];
 
 export default function Navigation() {
