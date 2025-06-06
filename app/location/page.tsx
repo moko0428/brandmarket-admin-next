@@ -4,52 +4,49 @@
 // 현재 위치와 각 지점 위치 비교 :✅
 // 가장 가까운 지점 찾기 :✅
 // 가장 가까운 지점 표시 :✅
-import { RefreshCw } from 'lucide-react';
-import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk';
+import { MapPin, RefreshCw } from 'lucide-react';
+import {
+  CustomOverlayMap,
+  Map,
+  MapMarker,
+  useKakaoLoader,
+} from 'react-kakao-maps-sdk';
 import { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { InputPair } from '@/common/components/input-pair';
-import { Input } from '@/common/components/ui/input';
 import LocationCard from './components/location-card';
 import { DateTime } from 'luxon';
 import { CURRENT_LOCATION_LAT, CURRENT_LOCATION_LNG } from './constants';
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/common/components/ui/drawer';
 import { StoreListFilter } from './components/store-list-filter';
 
-import { LocationMenu } from './components/location-menu';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const positions = [
   {
     title: '브랜드마켓-홍대',
-    latlng: { lat: 37.555409, lng: 126.920432 },
+    latlng: { lat: 37.55566928369786, lng: 126.92311262723686 },
   },
   {
     title: '브랜드마켓-성수',
     latlng: {
-      lat: 37.541735,
-      lng: 127.044697,
+      lat: 37.54406975675041,
+      lng: 127.05024699007517,
     },
   },
   {
     title: '브랜드마켓-강남',
     latlng: {
-      lat: 37.496791,
-      lng: 127.029337,
+      lat: 37.50093292254849,
+      lng: 127.02667251879825,
     },
   },
   {
     title: '브랜드마켓-홍대 상상마당',
     latlng: {
-      lat: 37.549711,
-      lng: 126.920564,
+      lat: 37.55185463006174,
+      lng: 126.92132000574637,
     },
   },
 ];
@@ -218,7 +215,6 @@ export default function LocationPage() {
   // 매장 이름으로 positions에서 위치 찾기
   const findStorePosition = (storeName: string) => {
     // 매장 이름에서 "브랜드마켓" 부분을 제거하고 positions 데이터와 매칭
-
     const position = positions.find((pos) =>
       pos.title.toLowerCase().includes(storeName.toLowerCase())
     );
@@ -249,8 +245,8 @@ export default function LocationPage() {
         () => {
           // 위치 가져오기 실패시 기본값으로 설정
           setMapCenter({
-            lat: 37.557527,
-            lng: 126.925595,
+            lat: 37.55566928369786,
+            lng: 126.92311262723686,
           });
         }
       );
@@ -347,77 +343,9 @@ export default function LocationPage() {
   };
 
   return (
-    <div className="grid md:grid-cols-3 grid-cols-1 gap-4 max-h-[calc(100vh-14rem)] overflow-hidden h-[calc(100vh-14rem)] min-h-full">
+    <div className="grid md:grid-cols-3 grid-cols-1 gap-4 max-h-[calc(100vh-14rem)] h-[calc(100vh-14rem)] min-h-full">
       <div className="col-span-2 relative">
         {/* 현재 위치 새로고침 버튼 (맵) */}
-        <div className="absolute bottom-100 right-4 z-10 md:top-4 md:right-4 md:block hidden">
-          <Button
-            variant="outline"
-            onClick={handleRefreshLocation}
-            className="bg-white hover:bg-gray-100"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            현재 위치
-          </Button>
-        </div>
-        {/* 모바일 검색 바 */}
-        <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-10 w-[95%] block md:hidden">
-          <div className="flex w-full h-12 justify-between items-center bg-white px-2 rounded-lg pointer-events-auto shadow-md gap-2">
-            <div className="flex w-full items-center">
-              <LocationMenu />
-              <Input
-                id="search-map"
-                value={value}
-                onChange={(e) => {
-                  setValue(e.target.value);
-                  handleSearch(e.target.value);
-                }}
-                placeholder="위치 검색 (예: 홍대, 성수, 강남)"
-                className="flex-1 bg-white w-full border-none shadow-none"
-              />
-            </div>
-            <Drawer shouldScaleBackground>
-              <DrawerTrigger>
-                <Button variant="ghost">매장 리스트</Button>
-              </DrawerTrigger>
-              <DrawerContent className="w-full flex flex-col rounded-t-[10px]">
-                <DrawerHeader>
-                  <div className="flex justify-between items-center">
-                    <DrawerTitle>브랜드마켓 매장 찾기</DrawerTitle>
-                    <StoreListFilter
-                      sortType={sortType}
-                      setSortType={setSortType}
-                      items={filterOptions}
-                    />
-                  </div>
-                  <DrawerDescription>
-                    가까운 매장을 찾아보세요
-                  </DrawerDescription>
-                </DrawerHeader>
-                <div className="flex-1 overflow-y-auto px-4">
-                  {/* 매장 리스트 */}
-                  {getSortedStores(storesWithDistance).map((store, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleCardClick(store.name)}
-                      className="cursor-pointer"
-                    >
-                      <LocationCard
-                        id={index}
-                        name={store.name}
-                        address={store.address}
-                        image={store.image}
-                        openTime={store.openTime}
-                        isOpen={isOpenTime(store.openTime)}
-                        distance={store.distance || ''}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </DrawerContent>
-            </Drawer>
-          </div>
-        </div>
         <div className="absolute bottom-100 right-4 z-10 md:top-4 md:right-4 md:block hidden">
           <Button
             variant="outline"
@@ -434,7 +362,7 @@ export default function LocationPage() {
             center={mapCenter}
             style={{
               width: '100%',
-              height: '800px',
+              height: '100%',
             }}
             level={3}
           >
@@ -453,20 +381,60 @@ export default function LocationPage() {
               />
             )}
 
-            {/* 매장 위치 마커 */}
             {positions.map((position, index) => (
-              <MapMarker
-                key={index}
-                position={position.latlng}
-                image={{
-                  src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
-                  size: {
-                    width: 24,
-                    height: 35,
-                  },
-                }}
-                title={position.title}
-              />
+              <CustomOverlayMap key={index} position={position.latlng}>
+                <div className="relative">
+                  {/* 핀 모양 */}
+                  <div className="absolute  -translate-y-4 bottom-10 left-1/2 -translate-x-2">
+                    <MapPin className="w-6 h-6 text-blue-500 bg-white rounded-full" />
+                  </div>
+
+                  {/* 기존 오버레이 내용 */}
+                  <div className="relative bg-white w-[200px] h-[120px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
+                    <div className="rounded-lg p-2 flex flex-col items-start">
+                      <Image
+                        src={'/assets/images/logo/brandmarket_logo.png'}
+                        alt="brandmarket_logo"
+                        width={48}
+                        height={48}
+                        className="bg-black rounded-lg mb-1"
+                      />
+                      {stores
+                        .filter((store) => {
+                          const storeName = store.name
+                            .replace('브랜드마켓 ', '')
+                            .replace('점', '');
+                          const matchingPosition = positions.find((pos) =>
+                            pos.title.includes(storeName)
+                          );
+                          return matchingPosition?.title === position.title;
+                        })
+                        .map((store) => (
+                          <div
+                            key={store.name}
+                            className="text-sm text-foreground text-center mt-1 flex flex-col items-start"
+                          >
+                            {store.name}
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`text-xs ${
+                                  isOpenTime(store.openTime)
+                                    ? 'text-green-600'
+                                    : 'text-red-600'
+                                }`}
+                              >
+                                {isOpenTime(store.openTime)
+                                  ? '영업중'
+                                  : '영업종료'}
+                              </div>
+                              <div>{store.openTime}</div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </CustomOverlayMap>
             ))}
           </Map>
         </div>
@@ -523,27 +491,48 @@ export default function LocationPage() {
       </div>
 
       {/* 모바일 매장 목록 */}
-      <div className="col-span-2 space-y-4 px-4 block md:hidden">
-        <h2 className="text-2xl font-bold">브랜드 마켓 매장 찾기</h2>
-
-        {/* 필터 */}
-        <div className="flex items-center justify-between p-4 relative">
-          <span>근처 매장: {filteredStores.length} 개</span>
-
-          <StoreListFilter
-            sortType={sortType}
-            setSortType={setSortType}
-            items={filterOptions}
-          />
-        </div>
-
-        {/* 매장 리스트 */}
-        <div className="flex flex-col border-t border-gray-200 border-b overflow-y-scroll h-[calc(100vh-20rem)] pb-24">
-          <div>
+      <div className="fixed bottom-0 w-full h-[55vh] bg-white border-t border-gray-200 rounded-t-[10px] shadow-xl z-10 overflow-hidden md:hidden block">
+        <div className="flex flex-col h-full">
+          <div className="flex-none px-4 py-3">
+            <div className="flex justify-between items-center pb-4">
+              <div>
+                <h2 className="text-xl font-semibold">브랜드마켓 매장 찾기</h2>
+                <p className="text-sm text-muted-foreground">
+                  가까운 매장을 찾아보세요
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="p-0"
+                  onClick={handleRefreshLocation}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+                <StoreListFilter
+                  sortType={sortType}
+                  setSortType={setSortType}
+                  items={filterOptions}
+                />
+              </div>
+            </div>
+            <InputPair
+              id="search-store"
+              label="매장 검색"
+              value={value}
+              onChange={(newValue) => {
+                setValue(newValue);
+                handleSearch(newValue);
+              }}
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-4">
             {getSortedStores(storesWithDistance).map((store, index) => (
-              <div
+              <Link
                 key={index}
-                onClick={() => handleCardClick(store.name)}
+                href={`/location/${store.name
+                  .replace('브랜드마켓 ', '')
+                  .replace('점', '')}`}
                 className="cursor-pointer"
               >
                 <LocationCard
@@ -555,7 +544,7 @@ export default function LocationPage() {
                   isOpen={isOpenTime(store.openTime)}
                   distance={store.distance || ''}
                 />
-              </div>
+              </Link>
             ))}
           </div>
         </div>
