@@ -29,7 +29,7 @@ export const viewport: Viewport = {
   themeColor: '#000000',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -37,8 +37,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body suppressHydrationWarning>
-        <Navigation />
-        <div className="border-x-neutral-100">{children}</div>
+        <Navigation
+          isLoggedIn={true}
+          avatar="https://github.com/shadcn.png"
+          role="관리자"
+          name="홍길동"
+          storename="브랜드마켓-성수점"
+        />
+        <div className="border-x-neutral-100 h-full w-full">{children}</div>
       </body>
     </html>
   );
