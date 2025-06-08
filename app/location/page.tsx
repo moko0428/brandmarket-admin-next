@@ -21,6 +21,7 @@ import { CURRENT_LOCATION_LAT, CURRENT_LOCATION_LNG } from './constants';
 import { StoreListFilter } from './components/store-list-filter';
 
 import Image from 'next/image';
+import StoreDetailSheet from './components/store-detail-sheet';
 import Link from 'next/link';
 
 const positions = [
@@ -51,7 +52,7 @@ const positions = [
   },
 ];
 
-const stores = [
+export const stores = [
   {
     name: '브랜드마켓 홍대점',
     address: '서울특별시 마포구 홍대로 102',
@@ -84,6 +85,13 @@ const filterOptions = [
   { label: '기본순', value: 'none' },
 ];
 
+export type Store = {
+  name: string;
+  address: string;
+  openTime: string;
+  image: string;
+};
+
 // 거리 포맷팅 함수
 const formatDistance = (distance: number) => {
   if (distance < 1) {
@@ -110,6 +118,7 @@ export default function LocationPage() {
   const [sortType, setSortType] = useState<'distance' | 'status' | 'none'>(
     'none'
   );
+  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -211,26 +220,6 @@ export default function LocationPage() {
         삐빅 문제가 발생했습니다. {error.message}
       </div>
     );
-
-  // 매장 이름으로 positions에서 위치 찾기
-  const findStorePosition = (storeName: string) => {
-    // 매장 이름에서 "브랜드마켓" 부분을 제거하고 positions 데이터와 매칭
-    const position = positions.find((pos) =>
-      pos.title.toLowerCase().includes(storeName.toLowerCase())
-    );
-    return position?.latlng;
-  };
-
-  // LocationCard 클릭 핸들러
-  const handleCardClick = (storeName: string) => {
-    const cleanStoreName = storeName
-      .replace('브랜드마켓 ', '')
-      .replace('점', '');
-    const position = findStorePosition(cleanStoreName);
-    if (position) {
-      setMapCenter(position);
-    }
-  };
 
   const handleStoreSearch = (searchValue: string) => {
     // 검색어가 비어있으면 현재 위치로 복귀
@@ -469,23 +458,31 @@ export default function LocationPage() {
         {/* 매장 리스트 */}
         <div className="flex flex-col border-t border-gray-200 border-b overflow-y-scroll h-[calc(100vh-20rem)] pb-24">
           <div>
-            {getSortedStores(storesWithDistance).map((store, index) => (
-              <div
-                key={index}
-                onClick={() => handleCardClick(store.name)}
-                className="cursor-pointer"
-              >
-                <LocationCard
-                  id={index}
-                  name={store.name}
-                  address={store.address}
-                  image={store.image}
-                  openTime={store.openTime}
-                  isOpen={isOpenTime(store.openTime)}
-                  distance={store.distance || ''}
-                />
-              </div>
-            ))}
+            {getSortedStores(storesWithDistance).map((store, index) => {
+              const storeSlug = store.name
+                .replace('브랜드마켓 ', '')
+                .replace('점', '')
+                .toLowerCase()
+                .replace(/\s+/g, '-');
+
+              return (
+                <Link
+                  key={index}
+                  href={`/location/${storeSlug}`}
+                  className="block w-full hover:bg-gray-50"
+                >
+                  <LocationCard
+                    id={index}
+                    name={store.name}
+                    address={store.address}
+                    image={store.image}
+                    openTime={store.openTime}
+                    isOpen={isOpenTime(store.openTime)}
+                    distance={store.distance || ''}
+                  />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -528,11 +525,9 @@ export default function LocationPage() {
           </div>
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             {getSortedStores(storesWithDistance).map((store, index) => (
-              <Link
+              <div
                 key={index}
-                href={`/location/${store.name
-                  .replace('브랜드마켓 ', '')
-                  .replace('점', '')}`}
+                onClick={() => setSelectedStore(store)}
                 className="cursor-pointer"
               >
                 <LocationCard
@@ -544,11 +539,18 @@ export default function LocationPage() {
                   isOpen={isOpenTime(store.openTime)}
                   distance={store.distance || ''}
                 />
-              </Link>
+              </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Sheet 컴포넌트 */}
+      <StoreDetailSheet
+        store={selectedStore as Store}
+        onClose={() => setSelectedStore(null)}
+        isOpen={!!selectedStore}
+      />
     </div>
   );
 }
