@@ -30,7 +30,7 @@ const textResult = {
 };
 export default function ProductPage() {
   return (
-    <div className="px-20 py-10 h-screen">
+    <div className="px-10 h-screen">
       <Hero
         title="재고 관리"
         subtitle="재고 관리 테이블을 통해 재고를 관리합니다."

@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { useAtom } from 'jotai';
-import Camera from '../components/camera';
+import Camera from './camera';
 import { visionApiReadyImageAtom } from '../atoms/camera-atom';
 import { detectText } from '../actions';
 import Image from 'next/image';
 import { ReceiptDataType } from '../types/receipt-type';
 import { ocrResultAtom, editableReceiptAtom } from '../atoms/camera-atom';
-import { ReceiptEditor } from '../components/receipt-editor';
-import QrCodeBox from '../components/qr-code-box';
+import { ReceiptEditor } from './receipt-editor';
+import QrCodeBox from './qr-code-box';
 
 interface TextResult {
   parsedData?: ReceiptDataType;
