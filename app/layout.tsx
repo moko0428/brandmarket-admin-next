@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navigation from '@/common/components/navigation';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: '브랜드마켓 관리자 패널',
@@ -34,16 +35,22 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const referer = headersList.get('referer') || '';
+  const shouldShowNavigation = !referer.includes('/auth');
+
   return (
     <html lang="ko">
       <body suppressHydrationWarning>
-        <Navigation
-          isLoggedIn={true}
-          avatar="https://github.com/shadcn.png"
-          role="관리자"
-          name="홍길동"
-          storename="브랜드마켓-성수점"
-        />
+        {!shouldShowNavigation && (
+          <Navigation
+            isLoggedIn={false}
+            avatar="https://github.com/shadcn.png"
+            name="성수점"
+            storename="브랜드마켓"
+            role="관리자"
+          />
+        )}
         <div className="border-x-neutral-100 h-full w-full">{children}</div>
       </body>
     </html>

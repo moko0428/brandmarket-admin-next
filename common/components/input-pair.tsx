@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface InputPairProps {
   id: string;
   label?: string;
-  value: string;
+  value?: string;
   onChange?: (value: string) => void;
   className?: string;
   placeholder?: string;

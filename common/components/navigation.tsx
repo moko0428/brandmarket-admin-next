@@ -26,22 +26,14 @@ const menus = [
     name: 'Home',
     href: '/',
   },
-  // {
-  //   name: 'Inventory',
-  //   href: '/product',
-  // },
   {
     name: 'Location',
     href: '/location',
   },
-  // {
-  //   name: 'Profile',
-  //   href: '/users',
-  // },
 ];
 
 export default function Navigation({
-  isLoggedIn = false,
+  isLoggedIn,
   avatar,
   name,
   storename,
@@ -124,7 +116,10 @@ export default function Navigation({
                     className="w-full justify-start"
                     asChild
                   >
-                    <Link href="/" className="flex items-center gap-2">
+                    <Link
+                      href="/auth/logout"
+                      className="flex items-center gap-2"
+                    >
                       <LogOutIcon className="w-4 h-4" />
                       로그아웃
                     </Link>
@@ -136,8 +131,10 @@ export default function Navigation({
         </div>
       ) : (
         <div>
-          <Button asChild>
-            <Link href="/">Login</Link>
+          <Button className="w-full justify-start" asChild>
+            <Link href="/auth/login" className="flex items-center gap-2">
+              로그인
+            </Link>
           </Button>
         </div>
       )}
