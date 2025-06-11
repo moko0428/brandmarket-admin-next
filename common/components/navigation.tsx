@@ -120,11 +120,11 @@ export default function Navigation({
         </div>
       ) : (
         <div className="hidden md:block">
-          <Button className="w-full justify-start" asChild>
+          {/* <Button className="w-full justify-start" asChild>
             <Link href="/auth/login" className="flex items-center gap-2">
               로그인
             </Link>
-          </Button>
+          </Button> */}
         </div>
       )}
     </nav>
