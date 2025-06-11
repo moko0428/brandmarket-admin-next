@@ -24,9 +24,9 @@ export default function LocationCard({
           <Image
             src={image}
             alt={name}
-            className="bg-gray-200 w-full h-40 object-cover"
-            width={100}
-            height={100}
+            className="bg-black w-full h-70 object-contain"
+            width={1000}
+            height={1000}
           />
         ) : (
           <div className="bg-gray-200 w-full h-40" />

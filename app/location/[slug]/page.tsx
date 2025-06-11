@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { detailStoreList } from '../components/store-detail-sheet';
+import { detailStoreList } from '@/data/store';
 
 export default function StoreDetailPage() {
   const params = useParams();

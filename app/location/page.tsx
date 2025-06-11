@@ -18,65 +18,7 @@ import { StoreListFilter } from './components/store-list-filter';
 import Image from 'next/image';
 import StoreDetailSheet from './components/store-detail-sheet';
 import Link from 'next/link';
-
-const positions = [
-  {
-    title: '브랜드마켓-홍대',
-    latlng: { lat: 37.55566928369786, lng: 126.92311262723686 },
-  },
-  {
-    title: '브랜드마켓-성수',
-    latlng: {
-      lat: 37.54406975675041,
-      lng: 127.05024699007517,
-    },
-  },
-  {
-    title: '브랜드마켓-강남',
-    latlng: {
-      lat: 37.50093292254849,
-      lng: 127.02667251879825,
-    },
-  },
-  {
-    title: '브랜드마켓-홍대 상상마당',
-    latlng: {
-      lat: 37.55185463006174,
-      lng: 126.92132000574637,
-    },
-  },
-];
-
-const stores = [
-  {
-    id: 1,
-    name: '브랜드마켓 홍대점',
-    address: '서울특별시 마포구 홍대로 102',
-    openTime: '10:00 - 20:00',
-    image: '',
-  },
-  {
-    id: 2,
-    name: '브랜드마켓 성수점',
-    address: '서울특별시 성동구 성수일로 102',
-    openTime: '10:00 - 20:00',
-    image: '',
-  },
-  {
-    id: 3,
-    name: '브랜드마켓 강남점',
-    address: '서울특별시 강남구 강남대로 102',
-    openTime: '10:00 - 20:00',
-    image: '',
-  },
-  {
-    id: 4,
-    name: '브랜드마켓 홍대 상상마당점',
-    address: '서울특별시 마포구 홍대로 102',
-    openTime: '10:00 - 20:00',
-    image: '',
-  },
-];
+import { positions, stores } from '@/data/store';
 
 const filterOptions = [
   { label: '거리순', value: 'distance' },
