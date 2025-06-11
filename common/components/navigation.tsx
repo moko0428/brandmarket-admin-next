@@ -46,7 +46,7 @@ export default function Navigation({
   role: string;
 }) {
   return (
-    <nav className="flex px-20 h-16 items-center justify-between">
+    <nav className="flex px-5 h-16 items-center justify-between shadow-md">
       <div className="flex items-center">
         <Link href="/" className="font-bold tracking-tighter text-xl">
           BrandMarket
@@ -130,7 +130,7 @@ export default function Navigation({
           </DropdownMenu>
         </div>
       ) : (
-        <div>
+        <div className="hidden md:block">
           <Button className="w-full justify-start" asChild>
             <Link href="/auth/login" className="flex items-center gap-2">
               로그인

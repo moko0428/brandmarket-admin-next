@@ -54,24 +54,28 @@ const positions = [
 
 export const stores = [
   {
+    id: 1,
     name: '브랜드마켓 홍대점',
     address: '서울특별시 마포구 홍대로 102',
     openTime: '10:00 - 20:00',
     image: '',
   },
   {
+    id: 2,
     name: '브랜드마켓 성수점',
     address: '서울특별시 성동구 성수일로 102',
     openTime: '10:00 - 20:00',
     image: '',
   },
   {
+    id: 3,
     name: '브랜드마켓 강남점',
     address: '서울특별시 강남구 강남대로 102',
     openTime: '10:00 - 20:00',
     image: '',
   },
   {
+    id: 4,
     name: '브랜드마켓 홍대 상상마당점',
     address: '서울특별시 마포구 홍대로 102',
     openTime: '10:00 - 20:00',
@@ -86,6 +90,7 @@ const filterOptions = [
 ];
 
 export type Store = {
+  id: number;
   name: string;
   address: string;
   openTime: string;
@@ -379,8 +384,8 @@ export default function LocationPage() {
                   </div>
 
                   {/* 기존 오버레이 내용 */}
-                  <div className="relative bg-white w-[200px] h-[120px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
-                    <div className="rounded-lg p-2 flex flex-col items-start">
+                  <div className="relative bg-white w-[180px] h-[80px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
+                    <div className="rounded-lg p-2 flex items-center justify-center gap-2">
                       <Image
                         src={'/assets/images/logo/brandmarket_logo.png'}
                         alt="brandmarket_logo"
@@ -400,24 +405,22 @@ export default function LocationPage() {
                         })
                         .map((store) => (
                           <div
-                            key={store.name}
+                            key={store.id}
                             className="text-sm text-foreground text-center mt-1 flex flex-col items-start"
                           >
-                            {store.name}
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`text-xs ${
-                                  isOpenTime(store.openTime)
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                }`}
-                              >
-                                {isOpenTime(store.openTime)
-                                  ? '영업중'
-                                  : '영업종료'}
-                              </div>
-                              <div>{store.openTime}</div>
+                            {store.name.slice(5)}
+                            <div
+                              className={`text-xs ${
+                                isOpenTime(store.openTime)
+                                  ? 'text-green-600'
+                                  : 'text-red-600'
+                              }`}
+                            >
+                              {isOpenTime(store.openTime)
+                                ? '영업중'
+                                : '영업종료'}
                             </div>
+                            <div>{store.openTime}</div>
                           </div>
                         ))}
                     </div>
@@ -488,7 +491,7 @@ export default function LocationPage() {
       </div>
 
       {/* 모바일 매장 목록 */}
-      <div className="fixed bottom-0 w-full h-[55vh] bg-white border-t border-gray-200 rounded-t-[10px] shadow-xl z-10 overflow-hidden md:hidden block">
+      <div className="fixed bottom-0 w-full h-[40vh] bg-white border-t border-gray-200 rounded-t-[10px] shadow-xl z-10 overflow-hidden md:hidden block">
         <div className="flex flex-col h-full">
           <div className="flex-none px-4 py-3">
             <div className="flex justify-between items-center pb-4">
@@ -547,7 +550,7 @@ export default function LocationPage() {
 
       {/* Sheet 컴포넌트 */}
       <StoreDetailSheet
-        store={selectedStore as Store}
+        id={selectedStore?.id || 0}
         onClose={() => setSelectedStore(null)}
         isOpen={!!selectedStore}
       />

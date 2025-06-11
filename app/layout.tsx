@@ -42,7 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <body suppressHydrationWarning>
-        {!shouldShowNavigation && (
+        {shouldShowNavigation && (
           <Navigation
             isLoggedIn={false}
             avatar="https://github.com/shadcn.png"
