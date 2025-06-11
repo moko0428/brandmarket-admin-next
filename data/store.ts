@@ -1,9 +1,11 @@
 export const positions = [
   {
+    id: 1,
     title: '브랜드마켓-홍대',
     latlng: { lat: 37.55566928369786, lng: 126.92311262723686 },
   },
   {
+    id: 2,
     title: '브랜드마켓-성수',
     latlng: {
       lat: 37.54406975675041,
@@ -11,6 +13,7 @@ export const positions = [
     },
   },
   {
+    id: 3,
     title: '브랜드마켓-강남',
     latlng: {
       lat: 37.50093292254849,
@@ -18,6 +21,7 @@ export const positions = [
     },
   },
   {
+    id: 4,
     title: '브랜드마켓-홍대 상상마당',
     latlng: {
       lat: 37.55185463006174,
