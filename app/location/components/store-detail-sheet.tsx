@@ -16,7 +16,7 @@ import {
 import { useState } from 'react';
 import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 
-const detailStoreList = [
+export const detailStoreList = [
   {
     id: 1,
     name: '브랜드마켓 홍대점',

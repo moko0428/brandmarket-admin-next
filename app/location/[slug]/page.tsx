@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { stores } from '../page';
+import { detailStoreList } from '../components/store-detail-sheet';
 
 export default function StoreDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  const store = stores.find((s) => {
+  const store = detailStoreList.find((s) => {
     const storeSlug = s.name
       .replace('브랜드마켓 ', '')
       .replace('점', '')

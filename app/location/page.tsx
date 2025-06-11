@@ -52,7 +52,7 @@ const positions = [
   },
 ];
 
-export const stores = [
+const stores = [
   {
     id: 1,
     name: '브랜드마켓 홍대점',
