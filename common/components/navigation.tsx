@@ -1,12 +1,5 @@
 import Link from 'next/link';
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from './ui/navigation-menu';
-import { cn } from '@/lib/utils';
+import { NavigationMenu } from './ui/navigation-menu';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
 import {
@@ -21,16 +14,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { LayoutDashboardIcon, LogOutIcon, UserIcon } from 'lucide-react';
 
-const menus = [
-  {
-    name: 'Home',
-    href: '/',
-  },
-  {
-    name: 'Location',
-    href: '/location',
-  },
-];
+// const menus = [
+//   {
+//     name: 'Home',
+//     href: '/',
+//   },
+// ];
 
 export default function Navigation({
   isLoggedIn,
@@ -53,7 +42,7 @@ export default function Navigation({
         </Link>
         <Separator orientation="vertical" className="h-6 mx-4" />
         <NavigationMenu className="hidden md:block">
-          <NavigationMenuList>
+          {/* <NavigationMenuList>
             {menus.map((menu) => (
               <NavigationMenuItem key={menu.name}>
                 <NavigationMenuTrigger>
@@ -69,7 +58,7 @@ export default function Navigation({
                 </NavigationMenuTrigger>
               </NavigationMenuItem>
             ))}
-          </NavigationMenuList>
+          </NavigationMenuList> */}
         </NavigationMenu>
       </div>
 
