@@ -5,12 +5,7 @@
 // 가장 가까운 지점 찾기 :✅
 // 가장 가까운 지점 표시 :✅
 import { MapPin, RefreshCw } from 'lucide-react';
-import {
-  CustomOverlayMap,
-  Map,
-  MapMarker,
-  useKakaoLoader,
-} from 'react-kakao-maps-sdk';
+import { CustomOverlayMap, Map, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { InputPair } from '@/common/components/input-pair';
@@ -362,17 +357,15 @@ export default function LocationPage() {
           >
             {/* 현재 위치 마커 */}
             {currentLocation && (
-              <MapMarker
-                position={currentLocation}
-                image={{
-                  src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
-                  size: {
-                    width: 24,
-                    height: 35,
-                  },
-                }}
-                title="현재 위치"
-              />
+              <>
+                <CustomOverlayMap position={currentLocation}>
+                  <div className="relative">
+                    <div className="absolute  -translate-y-4 bottom-10 left-1/2 -translate-x-2">
+                      <MapPin className="w-6 h-6 text-blue-500 bg-white rounded-full" />
+                    </div>
+                  </div>
+                </CustomOverlayMap>
+              </>
             )}
 
             {positions.map((position, index) => (
