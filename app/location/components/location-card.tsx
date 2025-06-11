@@ -1,4 +1,5 @@
-import Image from 'next/image';
+import { Skeleton } from '@/common/components/ui/skeleton';
+import ImagePair from './imagePair';
 
 export default function LocationCard({
   id,
@@ -21,15 +22,9 @@ export default function LocationCard({
     <div className="flex flex-col gap-2 border-2 border-black/50 mb-2">
       <div key={id}>
         {image ? (
-          <Image
-            src={image}
-            alt={name}
-            className="bg-black w-full h-70 object-contain"
-            width={1000}
-            height={1000}
-          />
+          <ImagePair image={image} name={name} />
         ) : (
-          <div className="bg-gray-200 w-full h-40" />
+          <Skeleton className="w-full h-70" />
         )}
         <div className="p-2 space-y-2">
           <div className="flex flex-col">

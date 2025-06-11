@@ -46,7 +46,7 @@ export const stores = [
     name: '브랜드마켓 강남점',
     address: '서울특별시 강남구 강남대로 102',
     openTime: '10:00 - 20:00',
-    image: '',
+    image: '/assets/images/강남_매장사진.jpeg',
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ export const detailStoreList = [
     name: '브랜드마켓 홍대점',
     address: '서울 마포구 홍익로6길 27 지하1층 (동교동)',
     openTime: '10:30 - 22:00',
-    image: '',
+    image: '/assets/images/홍대_매장사진.jpeg',
     place: ['2호선 홍대입구역 9번 출구로 나와서 218m 이동 (4분거리)'],
     copy: [
       {
@@ -77,7 +77,7 @@ export const detailStoreList = [
     name: '브랜드마켓 성수점',
     address: '서울 성동구 연무장길 5 (성수동2가)',
     openTime: '10:30 - 22:00',
-    image: '',
+    image: '/assets/images/성수_매장사진.jpeg',
     place: [
       '수인분당선 서울숲역 1번 출구로 나와서 755m 이동 (12분거리)',
       '2호선 뚝섬역 5번 출구로 나와서 533m 이동 (9분거리)',
@@ -95,7 +95,7 @@ export const detailStoreList = [
     name: '브랜드마켓 강남점',
     address: '서울 강남구 강남대로 430 (역삼동)',
     openTime: '10:30 - 22:00',
-    image: '',
+    image: '/assets/images/강남_매장사진.jpeg',
     place: [
       '2호선 강남역 11번 출구로 나와서 417m 이동 (7분거리)',
       '신분당선 신논현역 6번 출구로 나와서 381m 이동 (6분거리)',

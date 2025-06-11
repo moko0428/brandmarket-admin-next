@@ -16,6 +16,8 @@ import {
 import { useState } from 'react';
 import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { detailStoreList } from '@/data/store';
+import { Skeleton } from '@/common/components/ui/skeleton';
+import ImagePair from './imagePair';
 
 export default function StoreDetailSheet({
   onClose,
@@ -49,7 +51,16 @@ export default function StoreDetailSheet({
           </SheetHeader>
 
           <div className="px-4 py-6 overflow-y-auto h-[calc(100dvh-80px)]">
-            <div className="aspect-video rounded-lg overflow-hidden bg-muted mb-6"></div>
+            <div className="aspect-video rounded-lg overflow-hidden bg-muted mb-6">
+              {detailStore?.image ? (
+                <ImagePair
+                  image={detailStore?.image || ''}
+                  name={detailStore?.name || ''}
+                />
+              ) : (
+                <Skeleton className="w-full h-70" />
+              )}
+            </div>
 
             <div className="space-y-4">
               <div>
