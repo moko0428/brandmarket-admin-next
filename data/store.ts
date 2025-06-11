@@ -53,7 +53,7 @@ export const stores = [
     name: '브랜드마켓 홍대 상상마당점',
     address: '서울특별시 마포구 홍대로 102',
     openTime: '10:00 - 20:00',
-    image: '',
+    image: '/assets/images/상상마당점_매장사진.jpeg',
   },
 ];
 
@@ -112,7 +112,7 @@ export const detailStoreList = [
     name: '브랜드마켓 홍대 상상마당점',
     address: '서울 마포구 어울림마당로 75 (서교동)',
     openTime: '10:30 - 22:00',
-    image: '',
+    image: '/assets/images/상상마당점_매장사진.jpeg',
     place: [
       '2호선 합정역 3번 출구로 나와서 790m 이동 (13분거리)',
       '6호선 상수역 1번 출구로 나와서 658m 이동 (11분거리)',
