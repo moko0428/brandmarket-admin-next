@@ -35,7 +35,7 @@ export const stores = [
     id: 1,
     name: '브랜드마켓 홍대1호점',
     address: '서울특별시 마포구 홍대로 102',
-    openTime: '10:00 - 20:00',
+    openTime: '10:30 - 22:00',
     image: '/assets/images/홍대_매장사진.jpeg',
   },
   {
@@ -49,7 +49,7 @@ export const stores = [
     id: 3,
     name: '브랜드마켓 강남점',
     address: '서울특별시 강남구 강남대로 102',
-    openTime: '10:00 - 20:00',
+    openTime: '10:30 - 22:00',
     image: '/assets/images/강남_매장사진.jpeg',
   },
   {
