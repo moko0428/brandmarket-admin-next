@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '브랜드마켓 | 맵',
+  title: '브랜드마켓 매장 찾기',
   description: '브랜드마켓 맵 페이지',
 };
 
