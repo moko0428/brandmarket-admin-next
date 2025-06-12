@@ -1,7 +1,7 @@
 export const positions = [
   {
     id: 1,
-    title: '브랜드마켓-홍대',
+    title: '브랜드마켓-홍대1호점',
     latlng: { lat: 37.55566928369786, lng: 126.92311262723686 },
   },
   {
@@ -22,7 +22,7 @@ export const positions = [
   },
   {
     id: 4,
-    title: '브랜드마켓-홍대 상상마당',
+    title: '브랜드마켓-홍대2호점',
     latlng: {
       lat: 37.55185463006174,
       lng: 126.92132000574637,
@@ -33,7 +33,7 @@ export const positions = [
 export const stores = [
   {
     id: 1,
-    name: '브랜드마켓 홍대점',
+    name: '브랜드마켓 홍대1호점',
     address: '서울특별시 마포구 홍대로 102',
     openTime: '10:00 - 20:00',
     image: '/assets/images/홍대_매장사진.jpeg',
@@ -42,7 +42,7 @@ export const stores = [
     id: 2,
     name: '브랜드마켓 성수점',
     address: '서울특별시 성동구 성수일로 102',
-    openTime: '10:00 - 20:00',
+    openTime: '10:30 - 21:30',
     image: '/assets/images/성수_매장사진.jpeg',
   },
   {
@@ -54,9 +54,9 @@ export const stores = [
   },
   {
     id: 4,
-    name: '브랜드마켓 홍대 상상마당점',
+    name: '브랜드마켓 홍대2호점',
     address: '서울특별시 마포구 홍대로 102',
-    openTime: '10:00 - 20:00',
+    openTime: '11:30 - 22:30',
     image: '/assets/images/상상마당점_매장사진.jpeg',
   },
 ];
@@ -64,7 +64,7 @@ export const stores = [
 export const detailStoreList = [
   {
     id: 1,
-    name: '브랜드마켓 홍대점',
+    name: '브랜드마켓 홍대1호점',
     address: '서울 마포구 홍익로6길 27 지하1층 (동교동)',
     openTime: '10:30 - 22:00',
     image: '/assets/images/홍대_매장사진.jpeg',
@@ -80,7 +80,7 @@ export const detailStoreList = [
     id: 2,
     name: '브랜드마켓 성수점',
     address: '서울 성동구 연무장길 5 (성수동2가)',
-    openTime: '10:30 - 22:00',
+    openTime: '10:30 - 21:30',
     image: '/assets/images/성수_매장사진.jpeg',
     place: [
       '수인분당선 서울숲역 1번 출구로 나와서 755m 이동 (12분거리)',
@@ -113,9 +113,9 @@ export const detailStoreList = [
   },
   {
     id: 4,
-    name: '브랜드마켓 홍대 상상마당점',
+    name: '브랜드마켓 홍대2호점',
     address: '서울 마포구 어울림마당로 75 (서교동)',
-    openTime: '10:30 - 22:00',
+    openTime: '11:30 - 22:30',
     image: '/assets/images/상상마당점_매장사진.jpeg',
     place: [
       '2호선 합정역 3번 출구로 나와서 790m 이동 (13분거리)',

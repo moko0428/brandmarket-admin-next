@@ -32,10 +32,10 @@ const filterOptions = [
 
 // 키워드 목록 추가
 const locationKeywords = [
-  { label: '홍대', value: '홍대' },
+  { label: '홍대1호점', value: '홍대1호' },
   { label: '성수', value: '성수' },
   { label: '강남', value: '강남' },
-  { label: '상상마당', value: '상상마당' },
+  { label: '홍대2호점', value: '홍대2호' },
 ];
 
 export type Store = {
@@ -434,6 +434,10 @@ export default function LocationPage() {
       <div className="fixed bottom-0 w-full h-[40vh] bg-white border-t border-gray-200 rounded-t-[10px] shadow-xl z-10 overflow-hidden md:hidden block">
         <div className="flex flex-col h-full">
           <div className="flex-none px-4 py-3">
+            <div className="w-full h-1 flex justify-center items-center">
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+            </div>
+
             <div className="flex justify-between items-center pb-4">
               <div>
                 <h2 className="text-xl font-semibold">브랜드마켓 매장 찾기</h2>
