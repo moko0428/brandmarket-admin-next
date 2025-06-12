@@ -32,9 +32,9 @@ const filterOptions = [
 
 // 키워드 목록 추가
 const locationKeywords = [
-  { label: '홍대1호점', value: '홍대1호' },
-  { label: '성수', value: '성수' },
   { label: '강남', value: '강남' },
+  { label: '성수', value: '성수' },
+  { label: '홍대1호점', value: '홍대1호' },
   { label: '홍대2호점', value: '홍대2호' },
 ];
 
