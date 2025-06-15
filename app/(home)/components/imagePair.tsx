@@ -8,14 +8,14 @@ export default function ImagePair({
   name: string;
 }) {
   return (
-    <div className="bg-black w-full h-70">
+    <div className="w-full p-2">
       <Image
         src={image}
         alt={name}
-        width={640}
-        height={360}
-        quality={75}
-        className="w-full h-70 object-contain"
+        width={800}
+        height={600}
+        quality={80}
+        className="w-full object-cover rounded-lg"
       />
     </div>
   );
