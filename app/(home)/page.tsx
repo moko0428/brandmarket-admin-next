@@ -1,10 +1,5 @@
 'use client';
-// 현재 위치 받아오기 :✅
-// 각 지점 위치 받아오기 :✅
-// 현재 위치와 각 지점 위치 비교 :✅
-// 가장 가까운 지점 찾기 :✅
-// 가장 가까운 지점 표시 :✅
-import { MapPin, RefreshCw } from 'lucide-react';
+import { MapPin, MenuIcon, RefreshCw } from 'lucide-react';
 import { CustomOverlayMap, Map, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
@@ -18,10 +13,11 @@ import StoreDetailSheet from './components/store-detail-sheet';
 import Link from 'next/link';
 import { positions, stores } from '@/data/store';
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/common/components/ui/sheet';
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/common/components/ui/drawer';
 import { CURRENT_LOCATION_LAT, CURRENT_LOCATION_LNG } from './constants';
 
 const filterOptions = [
@@ -74,6 +70,7 @@ export default function LocationPage() {
   );
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -274,7 +271,7 @@ export default function LocationPage() {
               handleStoreSearch(keyword.value);
             }
           }}
-          className="transition-colors"
+          className="transition-colors text-xs"
         >
           {keyword.label}
         </Button>
@@ -299,29 +296,15 @@ export default function LocationPage() {
   );
 
   return (
-    <div className="grid md:grid-cols-3 grid-cols-1 gap-4 max-h-[calc(100vh-14rem)] h-[calc(100vh-14rem)] min-h-full">
-      <div className="col-span-2 relative">
-        {/* 현재 위치 새로고침 버튼 (맵) */}
-        <div className="absolute bottom-100 right-4 z-10 md:top-4 md:right-4 md:block hidden">
-          <Button
-            variant="outline"
-            onClick={handleRefreshLocation}
-            className="bg-white hover:bg-gray-100"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            현재 위치
-          </Button>
-        </div>
-
-        <div className="w-full h-full pointer-events-auto">
-          <Map
-            center={mapCenter}
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            level={3}
-          >
+    <div className="grid grid-cols-1 md:grid-cols-3 h-screen">
+      {/* 지도 컨테이너 */}
+      <div className="col-span-1 md:col-span-2 relative h-[calc(100vh)] md:h-screen">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          </div>
+        ) : (
+          <Map center={mapCenter} className="w-full h-full" level={3}>
             {/* 현재 위치 마커 */}
             {currentLocation && (
               <>
@@ -389,7 +372,7 @@ export default function LocationPage() {
               </CustomOverlayMap>
             ))}
           </Map>
-        </div>
+        )}
       </div>
 
       {/* 데스크톱 매장 목록 */}
@@ -431,42 +414,64 @@ export default function LocationPage() {
       </div>
 
       {/* 모바일 매장 목록 */}
-      <div className="fixed bottom-0 w-full h-[40vh] bg-white border-t border-gray-200 rounded-t-[10px] shadow-xl z-10 overflow-hidden md:hidden block">
-        <div className="flex flex-col h-full">
-          <div className="flex-none px-4 py-3">
-            <div className="w-full h-1 flex justify-center items-center">
-              <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
-            </div>
-
-            <div className="flex justify-between items-center pb-4">
-              <div>
-                <h2 className="text-xl font-semibold">브랜드마켓 매장 찾기</h2>
-                <p className="text-sm text-muted-foreground">
-                  가까운 매장을 찾아보세요
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="p-0"
-                  onClick={handleRefreshLocation}
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-                <StoreListFilter
-                  sortType={sortType}
-                  setSortType={setSortType}
-                  items={filterOptions}
-                />
-              </div>
-            </div>
-            <KeywordButtons />
+      <div className="md:hidden block">
+        {/* Drawer 열기 버튼 */}
+        <Button
+          onClick={() => setIsDrawerOpen(true)}
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 z-10 bg-white shadow-xl border-2 border-gray-200 hover:bg-gray-50 rounded-full h-10"
+        >
+          <div className="flex items-center gap-2 px-4 py-2">
+            <MenuIcon className="w-4 h-4 text-foreground" />
+            <span className="text-sm text-foreground">매장 목록 보기</span>
           </div>
-          <Sheet>
-            <SheetTrigger asChild>
-              <div className="flex-1 overflow-y-auto px-4 pb-4">
+        </Button>
+
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          {/* <Drawer className="bg-black/20" /> */}
+          <DrawerContent
+            className="h-[40vh] min-h-[40vh] max-h-[calc(100vh-4rem)]"
+            data-vaul-drawer-direction="bottom"
+          >
+            <DrawerHeader className="sr-only">
+              <DrawerTitle>브랜드마켓 매장 목록</DrawerTitle>
+            </DrawerHeader>
+            <div className="flex flex-col h-full">
+              <div className="flex-none px-4 py-3">
+                <div className="flex justify-between items-center py-2 space-y-2">
+                  <div className="space-y-1">
+                    <h2 className="text-md font-semibold">
+                      브랜드마켓 매장 찾기
+                    </h2>
+                    <p className="text-xs text-muted-foreground">
+                      가까운 매장을 찾아보세요
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      className="p-0"
+                      onClick={handleRefreshLocation}
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                    <StoreListFilter
+                      sortType={sortType}
+                      setSortType={setSortType}
+                      items={filterOptions}
+                    />
+                  </div>
+                </div>
+                <KeywordButtons />
+              </div>
+
+              {/* 매장 리스트 */}
+              <div className="flex-1 overflow-y-auto px-4">
                 {getSortedStores(storesWithDistance).map((store, index) => (
-                  <div key={index} className="cursor-pointer">
+                  <div
+                    key={index}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedStore(store)}
+                  >
                     <LocationCard
                       id={store.id}
                       name={store.name}
@@ -479,69 +484,9 @@ export default function LocationPage() {
                   </div>
                 ))}
               </div>
-            </SheetTrigger>
-            <SheetContent
-              side="bottom"
-              className="h-[80vh] p-0 [&>button]:hidden"
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex justify-center p-2">
-                  <div className="w-10 h-1 bg-gray-200 rounded-full" />
-                </div>
-
-                {/* 헤더 부분 */}
-                <div className="flex-none px-4 py-3">
-                  <div className="flex justify-between items-center pb-4">
-                    <div>
-                      <h2 className="text-xl font-semibold">
-                        브랜드마켓 매장 찾기
-                      </h2>
-                      <p className="text-sm text-muted-foreground">
-                        가까운 매장을 찾아보세요
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="p-0"
-                        onClick={handleRefreshLocation}
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                      </Button>
-                      <StoreListFilter
-                        sortType={sortType}
-                        setSortType={setSortType}
-                        items={filterOptions}
-                      />
-                    </div>
-                  </div>
-                  <KeywordButtons />
-                </div>
-
-                {/* 매장 리스트 */}
-                <div className="flex-1 overflow-y-auto px-4">
-                  {getSortedStores(storesWithDistance).map((store, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer"
-                      onClick={() => setSelectedStore(store)}
-                    >
-                      <LocationCard
-                        id={store.id}
-                        name={store.name}
-                        address={store.address}
-                        image={store.image}
-                        openTime={store.openTime}
-                        isOpen={isOpenTime(store.openTime)}
-                        distance={store.distance || ''}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
 
       {/* Sheet 컴포넌트 */}
