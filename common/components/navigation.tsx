@@ -35,9 +35,12 @@ export default function Navigation({
   role: string;
 }) {
   return (
-    <nav className="flex px-5 h-16 items-center justify-between shadow-md">
+    <nav className="flex px-5 h-[40px] items-center justify-between shadow-md md:h-16">
       <div className="flex items-center">
-        <Link href="/" className="font-bold tracking-tighter text-xl">
+        <Link
+          href="/"
+          className="font-bold tracking-tighter md:text-xl text-lg"
+        >
           BrandMarket
         </Link>
         <Separator orientation="vertical" className="h-6 mx-4" />
