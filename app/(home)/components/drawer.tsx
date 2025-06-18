@@ -22,8 +22,8 @@ export default function Drawer({ children }: DrawerProps) {
 
   const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
   const CLOSE = vh * 0.15; // 15vh 이상 내리면 닫힘
-  const MIN_HEIGHT = 140; // (px)
-  const MAX_HEIGHT = vh * 0.8; // 최대
+  const MIN_HEIGHT = 140; // 매장 1개 + 핸들바 정도 높이 (px)
+  const MAX_HEIGHT = vh * 0.8; // 최대 80vh
 
   /* 스크롤 락 */
   useEffect(() => {
@@ -57,19 +57,22 @@ export default function Drawer({ children }: DrawerProps) {
     const move = (e: PointerEvent) => {
       if (startY.current == null) return;
       const delta = e.clientY - startY.current;
-      setDragY(delta);
+      setDragY(delta); // 위(–), 아래(+)
     };
 
     const up = () => {
       const final = offsetY + dragY;
 
-      if (final >= CLOSE) {
+      // 자동 닫기: 15vh 이상 내리거나 높이가 10vh 미만이 되면
+      const currentHeight = MIN_HEIGHT - final;
+      const shouldClose = final >= CLOSE || currentHeight < vh * 0.1;
+
+      if (shouldClose) {
         /* 충분히 내려서 닫는 경우 → 위치 초기화 */
         lastOffsetRef.current = 0;
         setDrawerOpen(false); // jotai 닫기
       } else {
         /* 최소/최대 높이 제한 */
-        const currentHeight = MIN_HEIGHT - final;
         const clampedHeight = Math.max(
           MIN_HEIGHT,
           Math.min(currentHeight, MAX_HEIGHT)
@@ -91,7 +94,16 @@ export default function Drawer({ children }: DrawerProps) {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
     };
-  }, [dragging, dragY, offsetY, setDrawerOpen, CLOSE, MIN_HEIGHT, MAX_HEIGHT]);
+  }, [
+    dragging,
+    dragY,
+    offsetY,
+    setDrawerOpen,
+    CLOSE,
+    MIN_HEIGHT,
+    MAX_HEIGHT,
+    vh,
+  ]);
 
   /* 닫히면 드래그 상태만 초기화 (위치는 유지) */
   useEffect(() => {
@@ -116,24 +128,25 @@ export default function Drawer({ children }: DrawerProps) {
       {/* Drawer 본체 */}
       <div
         onPointerDown={onPointerDown}
-        className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl overflow-hidden
+        className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl
           ${dragging ? '' : 'transition-all duration-150'}`}
         style={{
           height: `${currentHeight}px`,
           maxHeight: '80vh',
           transform: drawerOpen ? 'translateY(0)' : 'translateY(100%)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* 핸들바 (드래그 전용 영역) */}
-        <div
-          className="flex justify-center py-3 flex-shrink-0"
-          // onPointerDown={onPointerDown}
-        >
+        <div className="flex justify-center py-3 flex-shrink-0">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         {/* 매장 리스트 스크롤 영역 */}
-        <div className="flex-1 overflow-y-auto px-0">{children}</div>
+        <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
+          {children}
+        </div>
       </div>
     </>
   );
