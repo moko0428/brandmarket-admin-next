@@ -13,8 +13,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: '브랜드마켓 | 관리자',
-  description: '브랜드마켓 관리자 페이지',
+  title: 'Brand Market',
+  description: 'Brand Market',
 };
 
 export default function ProfileLayout({

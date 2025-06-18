@@ -113,6 +113,7 @@ export default function Drawer({ children }: DrawerProps) {
       />
 
       <div
+        onPointerDown={onHandlePointerDown}
         className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl
           ${dragging ? '' : 'transition-all duration-150'}`}
         style={{
@@ -124,7 +125,7 @@ export default function Drawer({ children }: DrawerProps) {
         }}
       >
         <div
-          onPointerDown={onHandlePointerDown}
+          // onPointerDown={onHandlePointerDown}
           className="flex justify-center py-3 flex-shrink-0 cursor-grab active:cursor-grabbing"
         >
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />

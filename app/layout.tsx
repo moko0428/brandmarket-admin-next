@@ -4,25 +4,25 @@ import Navigation from '@/common/components/navigation';
 import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
-  title: '브랜드마켓 관리자 패널',
-  description: '브랜드마켓 관리자 패널',
+  title: 'Brand Market',
+  description: 'Brand Market',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black',
-    title: '브랜드마켓 관리자 패널',
+    title: 'Brand Market',
   },
-  applicationName: '브랜드마켓 관리자 패널',
+  applicationName: 'Brand Market',
   formatDetection: {
     telephone: false,
   },
   icons: {
     icon: [
       { url: '/favicon.ico' },
-      { url: '/brand_market_192x192.png', sizes: '192x192' },
-      { url: '/brand_market_512x512.png', sizes: '512x512' },
+      { url: '/192x192.png', sizes: '192x192' },
+      { url: '/512x512.png', sizes: '512x512' },
     ],
-    apple: '/brand_market_192x192.png',
+    apple: '/192x192.png',
   },
 };
 
@@ -46,8 +46,8 @@ export default async function RootLayout({
           <Navigation
             isLoggedIn={false}
             avatar="https://github.com/shadcn.png"
-            name="성수점"
-            storename="브랜드마켓"
+            name="Brand Market"
+            storename="Brand Market"
             role="관리자"
           />
         )}
