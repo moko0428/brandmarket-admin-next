@@ -10,22 +10,18 @@ interface DrawerProps {
 
 export default function Drawer({ children }: DrawerProps) {
   const startY = useRef<number | null>(null);
-  const [dragY, setDragY] = useState(0); // 실시간 이동값
-  const [offsetY, setOffsetY] = useState(0); // 고정된 위치
+  const [dragY, setDragY] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
   const [dragging, setDragging] = useState(false);
 
-  /* jotai 상태 사용 */
   const [drawerOpen, setDrawerOpen] = useAtom(drawerOpenAtom);
-
-  /* 마지막 드래그 위치를 기억 */
   const lastOffsetRef = useRef(0);
 
   const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
-  const CLOSE = vh * 0.15; // 15vh 이상 내리면 닫힘
-  const MIN_HEIGHT = 140; // 매장 1개 + 핸들바 정도 높이 (px)
-  const MAX_HEIGHT = vh * 0.8; // 최대 80vh
+  const CLOSE = vh * 0.15;
+  const MIN_HEIGHT = 140;
+  const MAX_HEIGHT = vh * 0.8;
 
-  /* 스크롤 락 */
   useEffect(() => {
     if (drawerOpen) {
       const prev = document.body.style.overflow;
@@ -36,43 +32,37 @@ export default function Drawer({ children }: DrawerProps) {
     }
   }, [drawerOpen]);
 
-  /* Drawer가 열릴 때 직전 위치로 복원 (처음에는 최소 높이) */
   useEffect(() => {
     if (drawerOpen) {
       setOffsetY(lastOffsetRef.current);
     }
   }, [drawerOpen]);
 
-  /* 드래그 시작 */
-  const onPointerDown = (e: React.PointerEvent) => {
+  const onHandlePointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
     startY.current = e.clientY;
     setDragging(true);
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
-  /* 드래그 진행/종료 */
   useEffect(() => {
     if (!dragging) return;
 
     const move = (e: PointerEvent) => {
       if (startY.current == null) return;
       const delta = e.clientY - startY.current;
-      setDragY(delta); // 위(–), 아래(+)
+      setDragY(delta);
     };
 
     const up = () => {
       const final = offsetY + dragY;
-
-      // 자동 닫기: 15vh 이상 내리거나 높이가 10vh 미만이 되면
       const currentHeight = MIN_HEIGHT - final;
       const shouldClose = final >= CLOSE || currentHeight < vh * 0.1;
 
       if (shouldClose) {
-        /* 충분히 내려서 닫는 경우 → 위치 초기화 */
         lastOffsetRef.current = 0;
-        setDrawerOpen(false); // jotai 닫기
+        setDrawerOpen(false);
       } else {
-        /* 최소/최대 높이 제한 */
         const clampedHeight = Math.max(
           MIN_HEIGHT,
           Math.min(currentHeight, MAX_HEIGHT)
@@ -105,7 +95,6 @@ export default function Drawer({ children }: DrawerProps) {
     vh,
   ]);
 
-  /* 닫히면 드래그 상태만 초기화 (위치는 유지) */
   useEffect(() => {
     if (!drawerOpen) {
       setDragY(0);
@@ -113,21 +102,17 @@ export default function Drawer({ children }: DrawerProps) {
     }
   }, [drawerOpen]);
 
-  /* 현재 Drawer 높이 계산 */
   const currentHeight = MIN_HEIGHT - (offsetY + dragY);
 
   return (
     <>
-      {/* Overlay */}
       <div
         onClick={() => setDrawerOpen(false)}
         className={`fixed inset-0 bg-black/0 transition-opacity duration-200
           ${drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
       />
 
-      {/* Drawer 본체 */}
       <div
-        onPointerDown={onPointerDown}
         className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl
           ${dragging ? '' : 'transition-all duration-150'}`}
         style={{
@@ -138,12 +123,13 @@ export default function Drawer({ children }: DrawerProps) {
           flexDirection: 'column',
         }}
       >
-        {/* 핸들바 (드래그 전용 영역) */}
-        <div className="flex justify-center py-3 flex-shrink-0">
+        <div
+          onPointerDown={onHandlePointerDown}
+          className="flex justify-center py-3 flex-shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
-        {/* 매장 리스트 스크롤 영역 */}
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {children}
         </div>
