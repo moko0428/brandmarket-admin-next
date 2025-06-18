@@ -34,9 +34,9 @@ export default function LocationCard({
         </div>
         <div className="flex items-center gap-2">
           {isOpen ? (
-            <span className="text-sm text-green-500">영업중</span>
+            <span className="text-xs text-green-500">영업중</span>
           ) : (
-            <span className="text-sm text-red-500">영업 종료</span>
+            <span className="text-xs text-red-500">영업 종료</span>
           )}
           <span className="text-xs text-foreground/70">{openTime}</span>
           <span className="text-xs text-foreground/70">({distance})</span>
