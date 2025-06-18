@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navigation from '@/common/components/navigation';
 import { headers } from 'next/headers';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -41,6 +42,26 @@ export default async function RootLayout({
 
   return (
     <html lang="ko">
+      <head>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GCODE}`}
+          strategy="afterInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.GCODE}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning>
         {shouldShowNavigation && (
           <Navigation
