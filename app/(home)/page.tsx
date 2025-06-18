@@ -280,7 +280,7 @@ export default function LocationPage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 h-screen">
       {/* 지도 컨테이너 */}
-      <div className="col-span-1 md:col-span-2 relative h-[calc(100vh)] md:h-screen">
+      <div className="col-span-1 md:col-span-2 relative md:h-[calc(100vh-10rem)] h-screen">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
@@ -416,7 +416,8 @@ export default function LocationPage() {
           <span className="text-sm">매장 목록 보기</span>
         </button>
 
-        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        {/* Drawer 컴포넌트 - jotai 상태로 자동 관리 */}
+        <Drawer>
           <div className="flex justify-between items-center px-4 pb-3">
             <div className="flex w-full justify-between py-3">
               <div className="flex w-full justify-between items-center">
