@@ -32,7 +32,7 @@ export default function LocationCard({
           <span className="text-sm text-foreground">{name}</span>
           <span className="text-xs text-foreground/50">{address}</span>
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <div className="col-span-1">
             {isOpen ? (
               <span className="text-xs text-green-500">영업중</span>
@@ -40,12 +40,12 @@ export default function LocationCard({
               <span className="text-xs text-red-500">영업 종료</span>
             )}
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1">
             <span className="text-xs text-foreground/70">{openTime}</span>
           </div>
-          <div className="col-span-1">
-            <span className="text-xs text-foreground/70">({distance})</span>
-          </div>
+        </div>
+        <div className="">
+          <span className="text-xs text-foreground/70">({distance})</span>
         </div>
       </div>
     </div>
