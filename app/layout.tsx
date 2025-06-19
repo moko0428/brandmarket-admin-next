@@ -3,6 +3,7 @@ import './globals.css';
 import Navigation from '@/common/components/navigation';
 import { headers } from 'next/headers';
 import Script from 'next/script';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -73,6 +74,7 @@ export default async function RootLayout({
           />
         )}
         <div className="border-x-neutral-100 h-full w-full">{children}</div>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

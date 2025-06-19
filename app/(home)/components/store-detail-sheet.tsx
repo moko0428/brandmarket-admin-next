@@ -16,6 +16,7 @@ import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { detailStoreList } from '@/data/store';
 import { Skeleton } from '@/common/components/ui/skeleton';
 import ImagePair from './imagePair';
+import { toast } from 'sonner';
 
 export default function StoreDetailSheet({
   onClose,
@@ -31,6 +32,7 @@ export default function StoreDetailSheet({
   const [copied, setCopied] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const handleCopy = (text: string) => {
+    toast.success('복사되었습니다.');
     navigator.clipboard.writeText(text);
     setCopied(text);
     setTimeout(() => setCopied(null), 2000);
