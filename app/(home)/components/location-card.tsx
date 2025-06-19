@@ -19,33 +19,35 @@ export default function LocationCard({
   distance: string;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 border-b border-black/30 last:border-b-0">
-      <div key={id}>
+    <div className="grid grid-cols-5 gap-2 border-b border-black/30 last:border-b-0">
+      <div key={id} className="col-span-2">
         {image ? (
           <ImagePair image={image} name={name} />
         ) : (
           <Skeleton className="w-full h-70" />
         )}
       </div>
-      <div className="p-2 space-y-2 ">
+      <div className="p-2 space-y-2 col-span-3">
         <div className="flex flex-col space-y-1">
           <span className="text-sm text-foreground">{name}</span>
           <span className="text-xs text-foreground/50">{address}</span>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="col-span-1">
+        <div className="flex items-center gap-2">
+          <div className="shrink-0">
             {isOpen ? (
               <span className="text-xs text-green-500">영업중</span>
             ) : (
               <span className="text-xs text-red-500">영업 종료</span>
             )}
           </div>
-          <div className="col-span-1">
+          <div className="flex-1">
             <span className="text-xs text-foreground/70">{openTime}</span>
           </div>
-        </div>
-        <div className="">
-          <span className="text-xs text-foreground/70">({distance})</span>
+          <div className="shrink-0">
+            <span className="text-xs text-foreground/70">
+              ({distance ? distance : '0.0km'})
+            </span>
+          </div>
         </div>
       </div>
     </div>
