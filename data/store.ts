@@ -34,7 +34,7 @@ export const stores = [
   {
     id: 1,
     name: '브랜드마켓 홍대1호점',
-    address: '서울 마포구 홍익로6길 27 지하1층 (동교동)',
+    address: '서울 마포구 홍익로6길 27 (동교동)',
     openTime: '10:30 - 22:00',
     image: '/assets/images/홍대_매장사진.jpeg',
   },
@@ -65,13 +65,13 @@ export const detailStoreList = [
   {
     id: 1,
     name: '브랜드마켓 홍대1호점',
-    address: '서울 마포구 홍익로6길 27 지하1층 (동교동)',
+    address: '서울 마포구 홍익로6길 27 (동교동)',
     openTime: '10:30 - 22:00',
     image: '/assets/images/홍대_매장사진.jpeg',
     place: ['2호선 홍대입구역 9번 출구로 나와서 218m 이동 (4분거리)'],
     copy: [
       {
-        copy_road: '서울 마포구 홍익로6길 27 지하1층',
+        copy_road: '서울 마포구 홍익로6길 27',
         copy_street: '동교동 162-10',
       },
     ],
