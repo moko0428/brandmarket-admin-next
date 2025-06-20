@@ -48,7 +48,7 @@ export const stores = [
   {
     id: 3,
     name: '브랜드마켓 강남점',
-    address: '서울 강남구 강남대로 430 (역삼동)',
+    address: '서울 강남구 강남대로 410 (역삼동)',
     openTime: '10:30 - 22:00',
     image: '/assets/images/강남_매장사진.jpeg',
   },
@@ -97,7 +97,7 @@ export const detailStoreList = [
   {
     id: 3,
     name: '브랜드마켓 강남점',
-    address: '서울 강남구 강남대로 430 (역삼동)',
+    address: '서울 강남구 강남대로 410 (역삼동)',
     openTime: '10:30 - 22:00',
     image: '/assets/images/강남_매장사진.jpeg',
     place: [
@@ -106,7 +106,7 @@ export const detailStoreList = [
     ],
     copy: [
       {
-        copy_road: '서울 강남구 강남대로 430',
+        copy_road: '서울 강남구 강남대로 410',
         copy_street: '역삼동 815-3',
       },
     ],
