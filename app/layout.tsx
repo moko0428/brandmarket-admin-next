@@ -4,6 +4,7 @@ import Navigation from '@/common/components/navigation';
 import { headers } from 'next/headers';
 import Script from 'next/script';
 import { Toaster } from 'sonner';
+import { serverClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -39,11 +40,23 @@ export default async function RootLayout({
 }) {
   const headersList = await headers();
   const referer = headersList.get('referer') || '';
-  const shouldShowNavigation = !referer.includes('/auth');
+  const shouldShowNavigation = !referer.includes('/auth/login/a');
 
+  const {
+    data: { user },
+  } = await (await serverClient()).auth.getUser();
+  const isLoggedIn = !!user;
+  console.log('isLoggedIn', user?.role);
   return (
     <html lang="ko">
       <head>
+        {/* 광고 코드 */}
+        {/* <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.AD_CLIENT}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        /> */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GCODE}`}
           strategy="afterInteractive"
@@ -66,10 +79,10 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         {shouldShowNavigation && (
           <Navigation
-            isLoggedIn={false}
+            isLoggedIn={isLoggedIn}
             avatar="https://github.com/shadcn.png"
             name="Brand Market"
-            storename="Brand Market"
+            storename="홍대1호점"
             role="관리자"
           />
         )}

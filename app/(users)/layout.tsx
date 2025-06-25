@@ -8,12 +8,12 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from '@/common/components/ui/sidebar';
-import { ShoppingBagIcon } from 'lucide-react';
+import { ChartLineIcon, PackageIcon, ShoppingBagIcon } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Brand Market',
+  title: 'Brand Market | 관리자 페이지',
   description: 'Brand Market',
 };
 
@@ -37,22 +37,22 @@ export default function ProfileLayout({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* <SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/product">
                     <PackageIcon className="mr-2 h-4 w-4" />
                     재고 관리
                   </Link>
                 </SidebarMenuButton>
-              </SidebarMenuItem> */}
-              {/* <SidebarMenuItem>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/analytics">
                     <ChartLineIcon className="mr-2 h-4 w-4" />
                     추이 분석
                   </Link>
                 </SidebarMenuButton>
-              </SidebarMenuItem> */}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>

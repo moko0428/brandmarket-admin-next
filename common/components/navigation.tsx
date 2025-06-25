@@ -1,4 +1,6 @@
+'use client';
 import Link from 'next/link';
+import { useState } from 'react';
 import { NavigationMenu } from './ui/navigation-menu';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
@@ -13,6 +15,8 @@ import {
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { LayoutDashboardIcon, LogOutIcon, UserIcon } from 'lucide-react';
+import { useLogout } from '@/app/auth/hooks/use-logout';
+import { LogoutDialog } from '@/app/auth/components/logout-dialog';
 
 // const menus = [
 //   {
@@ -34,6 +38,15 @@ export default function Navigation({
   storename: string;
   role: string;
 }) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { isDialogOpen, openLogoutDialog, closeLogoutDialog, handleLogout } =
+    useLogout();
+
+  const handleLogoutClick = () => {
+    setIsDropdownOpen(false);
+    openLogoutDialog();
+  };
+
   return (
     <nav className="flex px-5 h-[40px] items-center justify-between shadow-md md:h-16">
       <div className="flex items-center">
@@ -66,8 +79,8 @@ export default function Navigation({
       </div>
 
       {isLoggedIn ? (
-        <div>
-          <DropdownMenu>
+        <div className="hidden md:block">
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <Avatar>
                 {avatar ? (
@@ -106,28 +119,28 @@ export default function Navigation({
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
-                    asChild
+                    onClick={handleLogoutClick}
                   >
-                    <Link
-                      href="/auth/logout"
-                      className="flex items-center gap-2"
-                    >
-                      <LogOutIcon className="w-4 h-4" />
-                      로그아웃
-                    </Link>
+                    <LogOutIcon className="w-4 h-4" />
+                    로그아웃
                   </Button>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <LogoutDialog
+            isOpen={isDialogOpen}
+            onClose={closeLogoutDialog}
+            onConfirm={handleLogout}
+          />
         </div>
       ) : (
         <div className="hidden md:block">
-          {/* <Button className="w-full justify-start" asChild>
+          <Button className="w-full justify-start" asChild>
             <Link href="/auth/login" className="flex items-center gap-2">
               로그인
             </Link>
-          </Button> */}
+          </Button>
         </div>
       )}
     </nav>
