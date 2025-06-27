@@ -1,8 +1,10 @@
 import { Skeleton } from '@/common/components/ui/skeleton';
 import ImagePair from './imagePair';
 
+// Supabase stores 테이블 타입 정의
+
 export default function LocationCard({
-  id,
+  store_id,
   name,
   address,
   image,
@@ -10,7 +12,7 @@ export default function LocationCard({
   openTime,
   distance,
 }: {
-  id: number;
+  store_id: string;
   name: string;
   address: string;
   image?: string;
@@ -20,7 +22,7 @@ export default function LocationCard({
 }) {
   return (
     <div className="grid grid-cols-5 gap-2 border-b border-black/30 last:border-b-0">
-      <div key={id} className="col-span-2">
+      <div key={store_id} className="col-span-2">
         {image ? (
           <ImagePair image={image} name={name} />
         ) : (
@@ -29,7 +31,7 @@ export default function LocationCard({
       </div>
       <div className="p-2 space-y-2 col-span-3">
         <div className="flex flex-col space-y-1">
-          <span className="text-sm text-foreground">{name}</span>
+          <span className="text-sm text-foreground">브랜드마켓 {name}</span>
           <span className="text-xs text-foreground/50">{address}</span>
         </div>
         <div className="flex items-center gap-2">

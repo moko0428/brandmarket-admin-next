@@ -19,40 +19,34 @@ import { StoreListFilter } from './components/store-list-filter';
 import Image from 'next/image';
 import StoreDetailSheet from './components/store-detail-sheet';
 import Link from 'next/link';
-import { positions, stores } from '@/data/store';
+import { getStores } from './action';
 
 import { CURRENT_LOCATION_LAT, CURRENT_LOCATION_LNG } from './constants';
 import Drawer from './components/drawer';
+
+// Supabase Store 타입 정의
+interface SupabaseStore {
+  store_id: string;
+  branch: string;
+  address: string;
+  open_time: string;
+  close_time: string;
+  latitude: string;
+  longitude: string;
+  location: string;
+  description: string;
+  store_image: string;
+  profile_id: string;
+  created_at: string;
+  updated_at: string;
+  directions: string[];
+}
 
 const filterOptions = [
   { label: '거리순', value: 'distance' },
   { label: '영업상태순', value: 'status' },
   { label: '기본순', value: 'none' },
 ];
-
-// 키워드 목록 추가
-const locationKeywords = [
-  { label: '강남', value: '강남' },
-  { label: '성수', value: '성수' },
-  { label: '홍대1호점', value: '홍대1호' },
-  { label: '홍대2호점', value: '홍대2호' },
-];
-
-export type Store = {
-  id: number;
-  name: string;
-  address: string;
-  openTime: string;
-  image: string;
-};
-
-// 거리 포맷팅 함수
-const formatDistance = (distance: number) => {
-  if (distance < 1) {
-    return `${Math.round(distance * 1000)}m`;
-  }
-  return `${Math.round(distance * 10) / 10}km`;
-};
 
 export default function LocationPage() {
   const [loading, error] = useKakaoLoader({
@@ -67,16 +61,31 @@ export default function LocationPage() {
     lng: CURRENT_LOCATION_LNG,
   });
 
+  const [stores, setStores] = useState<SupabaseStore[]>([]);
   const [filteredStores, setFilteredStores] = useAtom(filteredStoresAtom);
   const [distances, setDistances] = useState<{ [key: string]: number }>({});
   const [sortType, setSortType] = useAtom(sortTypeAtom);
   const [selectedStore, setSelectedStore] = useAtom(selectedStoreAtom);
   const [selectedKeyword, setSelectedKeyword] = useAtom(selectedKeywordAtom);
   const [drawerOpen, setDrawerOpen] = useAtom(drawerOpenAtom);
+  const [isLoadingStores, setIsLoadingStores] = useState(true);
 
+  // Supabase에서 매장 데이터 로드
   useEffect(() => {
-    console.log('LocationPage 컴포넌트 마운트됨');
-  }, []);
+    const loadStores = async () => {
+      try {
+        const storesData = await getStores();
+        setStores(storesData);
+        setFilteredStores(storesData);
+      } catch (error) {
+        console.error('매장 데이터 로드 에러:', error);
+      } finally {
+        setIsLoadingStores(false);
+      }
+    };
+
+    loadStores();
+  }, [setFilteredStores]);
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -124,24 +133,32 @@ export default function LocationPage() {
 
   // 현재 위치가 업데이트될 때마다 거리 계산
   useEffect(() => {
-    if (currentLocation) {
-      const newDistances = positions.reduce((acc, position) => {
+    if (currentLocation && stores.length > 0) {
+      const newDistances = stores.reduce((acc, store) => {
         const distance = calculateDistance(
           currentLocation.lat,
           currentLocation.lng,
-          position.latlng.lat,
-          position.latlng.lng
+          parseFloat(store.latitude),
+          parseFloat(store.longitude)
         );
         return {
           ...acc,
-          [position.title]: Math.round(distance * 10) / 10,
+          [store.store_id]: Math.round(distance * 10) / 10,
         };
       }, {});
       setDistances(newDistances);
     }
-  }, [currentLocation]);
+  }, [currentLocation, stores]);
 
-  if (loading)
+  // 거리 포맷팅 함수를 먼저 정의
+  const formatDistance = (distance: number) => {
+    if (distance < 1) {
+      return `${Math.round(distance * 1000)}m`;
+    }
+    return `${Math.round(distance * 10) / 10}km`;
+  };
+
+  if (loading || isLoadingStores)
     return (
       <div className="flex justify-center items-center h-full">
         페이지를 불러오는 중 입니다.. 잠시만 기다려주세요..
@@ -155,48 +172,43 @@ export default function LocationPage() {
     );
 
   const handleStoreSearch = (searchValue: string) => {
-    // 지도 이동
-    const foundPosition = positions.find((position) =>
-      position.title.toLowerCase().includes(searchValue.toLowerCase())
-    );
-
-    if (foundPosition) {
-      setMapCenter(foundPosition.latlng);
-    }
-
     // 매장 리스트 필터링
     const filtered = stores.filter((store) => {
-      const storeName = store.name
-        .replace('브랜드마켓 ', '')
-        .replace('점', '')
-        .toLowerCase();
+      const storeName = store.branch.toLowerCase();
       return storeName.includes(searchValue.toLowerCase());
     });
 
     setFilteredStores(filtered);
+
+    // 추가: 해당 키워드의 첫 번째 매장으로 지도 이동
+    const firstMatchingStore = filtered[0];
+    if (firstMatchingStore) {
+      const lat = parseFloat(firstMatchingStore.latitude);
+      const lng = parseFloat(firstMatchingStore.longitude);
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        setMapCenter({ lat, lng });
+      }
+    }
   };
 
-  const isOpenTime = (openTimeStr: string) => {
+  const isOpenTime = (openTimeStr: string, closeTimeStr: string) => {
     const now = DateTime.now();
-    const [startTime, endTime] = openTimeStr.split(' - ');
-
-    const [startHour] = startTime.split(':').map(Number);
-    const [endHour] = endTime.split(':').map(Number);
+    const [startHour, startMinute] = openTimeStr.split(':').map(Number);
+    const [endHour, endMinute] = closeTimeStr.split(':').map(Number);
 
     const currentHour = now.hour;
+    const currentMinute = now.minute;
+    const currentTime = currentHour * 60 + currentMinute;
+    const startTime = startHour * 60 + startMinute;
+    const endTime = endHour * 60 + endMinute;
 
-    return currentHour >= startHour && currentHour < endHour;
+    return currentTime >= startTime && currentTime < endTime;
   };
 
   // 거리 계산 함수
   const storesWithDistance = filteredStores.map((store) => {
-    const storeName = store.name.replace('브랜드마켓 ', '').replace('점', '');
-    const matchingPosition = positions.find((pos) =>
-      pos.title.includes(storeName)
-    );
-    const distance = matchingPosition
-      ? distances[matchingPosition.title]
-      : null;
+    const distance = distances[store.store_id];
 
     return {
       ...store,
@@ -219,8 +231,8 @@ export default function LocationPage() {
         });
       case 'status':
         return [...stores].sort((a, b) => {
-          const isAOpen = isOpenTime(a.openTime);
-          const isBOpen = isOpenTime(b.openTime);
+          const isAOpen = isOpenTime(a.open_time, a.close_time);
+          const isBOpen = isOpenTime(b.open_time, b.close_time);
           if (isAOpen && !isBOpen) return -1;
           if (!isAOpen && isBOpen) return 1;
           return 0;
@@ -230,52 +242,55 @@ export default function LocationPage() {
     }
   };
 
-  // 키워드 버튼 컴포넌트
-  const KeywordButtons = () => (
-    <div className="flex gap-2 flex-wrap items-center">
-      {locationKeywords.map((keyword) => (
-        <Button
-          key={keyword.value}
-          variant={selectedKeyword === keyword.value ? 'default' : 'outline'}
-          size="sm"
-          type="button"
-          onClick={() => {
-            if (selectedKeyword === keyword.value) {
-              // 같은 키워드를 다시 클릭하면 필터 해제
-              setSelectedKeyword(null);
-              setFilteredStores(stores);
-              // 현재 위치로 지도 이동
-              if (currentLocation) {
-                setMapCenter(currentLocation);
+  // 키워드 버튼 컴포넌트 (동적으로 생성)
+  const KeywordButtons = () => {
+    const uniqueKeywords = [...new Set(stores.map((store) => store.branch))];
+
+    return (
+      <div className="flex gap-2 flex-wrap items-center">
+        {uniqueKeywords.map((keyword) => (
+          <Button
+            key={keyword}
+            variant={selectedKeyword === keyword ? 'default' : 'outline'}
+            size="sm"
+            type="button"
+            onClick={() => {
+              if (selectedKeyword === keyword) {
+                // 같은 키워드를 다시 클릭하면 필터 해제
+                setSelectedKeyword(null);
+                setFilteredStores(stores);
+                // 현재 위치로 지도 이동
+                if (currentLocation) {
+                  setMapCenter(currentLocation);
+                }
+              } else {
+                setSelectedKeyword(keyword);
+                handleStoreSearch(keyword);
               }
-            } else {
-              setSelectedKeyword(keyword.value);
-              handleStoreSearch(keyword.value);
+            }}
+            className="transition-colors text-xs"
+          >
+            {keyword}
+          </Button>
+        ))}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setSelectedKeyword(null);
+            setFilteredStores(stores);
+            if (currentLocation) {
+              setMapCenter(currentLocation);
             }
+            setSortType('none');
           }}
-          className="transition-colors text-xs"
+          className="text-muted-foreground hover:text-foreground"
         >
-          {keyword.label}
+          초기화
         </Button>
-      ))}
-      {/* 필터 초기화 버튼 */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          setSelectedKeyword(null);
-          setFilteredStores(stores);
-          if (currentLocation) {
-            setMapCenter(currentLocation);
-          }
-          setSortType('none'); // 정렬도 초기화
-        }}
-        className="text-muted-foreground hover:text-foreground"
-      >
-        초기화
-      </Button>
-    </div>
-  );
+      </div>
+    );
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 h-screen">
@@ -292,7 +307,7 @@ export default function LocationPage() {
               <>
                 <CustomOverlayMap position={currentLocation}>
                   <div className="relative">
-                    <div className="absolute  -translate-y-4 bottom-10 left-1/2 -translate-x-2">
+                    <div className="absolute -translate-y-4 bottom-10 left-1/2 -translate-x-2">
                       <MapPin className="w-6 h-6 text-blue-500 bg-white rounded-full" />
                     </div>
                   </div>
@@ -300,19 +315,23 @@ export default function LocationPage() {
               </>
             )}
 
-            {positions.map((position, index) => (
-              <CustomOverlayMap key={index} position={position.latlng}>
+            {stores.map((store) => (
+              <CustomOverlayMap
+                key={store.store_id}
+                position={{
+                  lat: parseFloat(store.latitude),
+                  lng: parseFloat(store.longitude),
+                }}
+              >
                 <div
                   className="relative"
                   onClick={() => {
-                    setSelectedStore(
-                      stores.find((store) => store.id === position.id) || null
-                    );
+                    setSelectedStore(store);
                     setDrawerOpen(true);
                   }}
                 >
                   {/* 핀 모양 */}
-                  <div className="absolute  -translate-y-4 bottom-10 left-1/2 -translate-x-2">
+                  <div className="absolute -translate-y-4 bottom-10 left-1/2 -translate-x-2">
                     <MapPin className="w-6 h-6 text-blue-500 bg-white rounded-full" />
                   </div>
 
@@ -320,42 +339,32 @@ export default function LocationPage() {
                   <div className="relative bg-white w-[180px] h-[80px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
                     <div className="rounded-lg p-2 flex items-center justify-center gap-2">
                       <Image
-                        src={'/assets/images/logo/brandmarket_logo.png'}
+                        src={
+                          store.store_image ||
+                          '/assets/images/logo/brandmarket_logo.png'
+                        }
                         alt="brandmarket_logo"
                         width={48}
                         height={48}
                         className="bg-black rounded-lg mb-1"
                       />
-                      {stores
-                        .filter((store) => {
-                          const storeName = store.name
-                            .replace('브랜드마켓 ', '')
-                            .replace('점', '');
-                          const matchingPosition = positions.find((pos) =>
-                            pos.title.includes(storeName)
-                          );
-                          return matchingPosition?.title === position.title;
-                        })
-                        .map((store) => (
-                          <div
-                            key={store.id}
-                            className="text-sm text-foreground text-center mt-1 flex flex-col items-start"
-                          >
-                            {store.name.slice(5)}
-                            <div
-                              className={`text-xs ${
-                                isOpenTime(store.openTime)
-                                  ? 'text-green-600'
-                                  : 'text-red-600'
-                              }`}
-                            >
-                              {isOpenTime(store.openTime)
-                                ? '영업중'
-                                : '영업종료'}
-                            </div>
-                            <div>{store.openTime}</div>
-                          </div>
-                        ))}
+                      <div className="text-sm text-foreground text-center mt-1 flex flex-col items-start">
+                        {store.branch}
+                        <div
+                          className={`text-xs ${
+                            isOpenTime(store.open_time, store.close_time)
+                              ? 'text-green-600'
+                              : 'text-red-600'
+                          }`}
+                        >
+                          {isOpenTime(store.open_time, store.close_time)
+                            ? '영업중'
+                            : '영업종료'}
+                        </div>
+                        <div>
+                          {store.open_time} - {store.close_time}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -384,17 +393,17 @@ export default function LocationPage() {
           <div>
             {getSortedStores(storesWithDistance).map((store) => (
               <Link
-                key={store.id}
-                href={`/store/${store.id}`}
+                key={store.store_id}
+                href={`/store/${store.store_id}`}
                 className="block w-full hover:bg-gray-50"
               >
                 <LocationCard
-                  id={store.id}
-                  name={store.name}
+                  store_id={store.store_id}
+                  name={store.branch}
                   address={store.address}
-                  image={store.image}
-                  openTime={store.openTime}
-                  isOpen={isOpenTime(store.openTime)}
+                  image={store.store_image}
+                  openTime={`${store.open_time} - ${store.close_time}`}
+                  isOpen={isOpenTime(store.open_time, store.close_time)}
                   distance={store.distance || ''}
                 />
               </Link>
@@ -445,19 +454,19 @@ export default function LocationPage() {
           <div className="flex-1 overflow-y-scroll px-4 pb-6">
             {getSortedStores(storesWithDistance).map((store) => (
               <div
-                key={store.id}
+                key={store.store_id}
                 onClick={() => {
                   setSelectedStore(store);
                 }}
                 className="cursor-pointer"
               >
                 <LocationCard
-                  id={store.id}
-                  name={store.name}
+                  store_id={store.store_id}
+                  name={store.branch}
                   address={store.address}
-                  image={store.image}
-                  openTime={store.openTime}
-                  isOpen={isOpenTime(store.openTime)}
+                  image={store.store_image}
+                  openTime={`${store.open_time} - ${store.close_time}`}
+                  isOpen={isOpenTime(store.open_time, store.close_time)}
                   distance={store.distance || ''}
                 />
               </div>
@@ -468,7 +477,7 @@ export default function LocationPage() {
 
       {/* Sheet 컴포넌트 */}
       <StoreDetailSheet
-        id={selectedStore?.id || 0}
+        id={selectedStore?.store_id || ''}
         onClose={() => setSelectedStore(null)}
         isOpen={!!selectedStore}
       />

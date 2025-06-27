@@ -50,12 +50,11 @@ export default function Navigation({
   return (
     <nav className="flex px-5 h-[40px] items-center justify-between shadow-md md:h-16">
       <div className="flex items-center">
-        <Link
-          href="/"
-          className="font-bold tracking-tighter md:text-xl text-lg"
-        >
-          BrandMarket
-        </Link>
+        <Button variant="ghost" asChild className="p-0 h-auto">
+          <Link href="/" className="font-bold text-lg md:text-xl">
+            BrandMarket
+          </Link>
+        </Button>
         <Separator orientation="vertical" className="h-6 mx-4" />
         <NavigationMenu className="hidden md:block">
           {/* <NavigationMenuList>

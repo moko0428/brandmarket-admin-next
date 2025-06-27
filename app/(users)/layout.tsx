@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from '@/common/components/ui/sidebar';
+import { serverClient } from '@/lib/supabase/server';
 import { ChartLineIcon, PackageIcon, ShoppingBagIcon } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -17,15 +18,27 @@ export const metadata: Metadata = {
   description: 'Brand Market',
 };
 
-export default function ProfileLayout({
+export default async function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await serverClient();
+  const { data: user } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('profile_id', user?.user?.id || '');
+
+  const userProfile = Array.isArray(profile) ? profile[0] : profile;
   return (
     <SidebarProvider className="max-h-[calc(100vh-7rem)] overflow-hidden h-[calc(100vh-7rem)] min-h-full">
       <Sidebar variant="floating" className="pt-16">
-        <SidebarHeader>BrandMarket</SidebarHeader>
+        <SidebarHeader className="pointer-events-none">
+          {userProfile?.role === 'admin'
+            ? 'BrandMarket 관리자'
+            : userProfile?.location_name || '사용자'}
+        </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <SidebarMenu>
