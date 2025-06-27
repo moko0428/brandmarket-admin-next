@@ -29,13 +29,12 @@ export default function Navigation({
   isLoggedIn,
   avatar,
   name,
-  storename,
+
   role,
 }: {
   isLoggedIn?: boolean;
   avatar?: string;
   name?: string;
-  storename?: string;
   role?: string;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -93,12 +92,8 @@ export default function Navigation({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>
-                <span className="font-medium">{storename}</span>
-                <span className="text-xs text-muted-foreground">
-                  {name}
-                  <br />
-                  {role}
-                </span>
+                <span className="font-medium">{name}</span>
+                <span className="text-xs text-muted-foreground">{role}</span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>

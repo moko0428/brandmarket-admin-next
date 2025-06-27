@@ -9,7 +9,12 @@ import {
   SidebarProvider,
 } from '@/common/components/ui/sidebar';
 import { serverClient } from '@/lib/supabase/server';
-import { ChartLineIcon, PackageIcon, ShoppingBagIcon } from 'lucide-react';
+import {
+  // ChartLineIcon,
+  HomeIcon,
+  // PackageIcon,
+  ShoppingBagIcon,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -58,7 +63,7 @@ export default async function ProfileLayout({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
+              {/* <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/product">
                     <PackageIcon className="mr-2 h-4 w-4" />
@@ -71,6 +76,14 @@ export default async function ProfileLayout({
                   <Link href="/analytics">
                     <ChartLineIcon className="mr-2 h-4 w-4" />
                     추이 분석
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem> */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/">
+                    <HomeIcon className="mr-2 h-4 w-4" />
+                    홈으로 가기
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

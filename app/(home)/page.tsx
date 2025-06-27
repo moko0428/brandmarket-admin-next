@@ -19,7 +19,7 @@ import { StoreListFilter } from './components/store-list-filter';
 import Image from 'next/image';
 import StoreDetailSheet from './components/store-detail-sheet';
 import Link from 'next/link';
-import { getStores } from './action';
+import { getStores, getAdminProfile } from './action';
 
 import { CURRENT_LOCATION_LAT, CURRENT_LOCATION_LNG } from './constants';
 import Drawer from './components/drawer';
@@ -69,6 +69,9 @@ export default function LocationPage() {
   const [selectedKeyword, setSelectedKeyword] = useAtom(selectedKeywordAtom);
   const [drawerOpen, setDrawerOpen] = useAtom(drawerOpenAtom);
   const [isLoadingStores, setIsLoadingStores] = useState(true);
+  const [adminAvatar, setAdminAvatar] = useState<string>(
+    '/brandmarket_logo.png'
+  );
 
   // Supabase에서 매장 데이터 로드
   useEffect(() => {
@@ -109,6 +112,22 @@ export default function LocationPage() {
         }
       );
     }
+  }, []);
+
+  // Admin 프로필 로드
+  useEffect(() => {
+    const loadAdminProfile = async () => {
+      try {
+        const adminProfile = await getAdminProfile();
+        if (adminProfile?.avatar) {
+          setAdminAvatar(adminProfile.avatar);
+        }
+      } catch (error) {
+        console.error('Admin 프로필 로드 에러:', error);
+      }
+    };
+
+    loadAdminProfile();
   }, []);
 
   // 두 지점 간의 거리 계산 함수
@@ -339,10 +358,7 @@ export default function LocationPage() {
                   <div className="relative bg-white w-[180px] h-[80px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
                     <div className="rounded-lg p-2 flex items-center justify-center gap-2">
                       <Image
-                        src={
-                          store.store_image ||
-                          '/assets/images/logo/brandmarket_logo.png'
-                        }
+                        src={adminAvatar}
                         alt="brandmarket_logo"
                         width={48}
                         height={48}

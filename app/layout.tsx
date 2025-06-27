@@ -96,7 +96,6 @@ export default async function RootLayout({
             isLoggedIn={isLoggedIn}
             avatar={userProfile?.avatar || ''}
             name={userProfile?.location_name}
-            storename={userProfile?.location_name}
             role={userProfile?.role}
           />
         )}

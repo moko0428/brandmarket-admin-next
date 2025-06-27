@@ -16,6 +16,21 @@ export async function getStores() {
   return data || [];
 }
 
+export async function getAdminProfile() {
+  const supabase = await serverClient();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'admin')
+    .single();
+
+  if (error) {
+    console.error('Admin 프로필 조회 에러:', error);
+    return null;
+  }
+  return data;
+}
+
 export async function getStoreById(storeId: string) {
   const supabase = await serverClient();
   const { data, error } = await supabase
@@ -26,6 +41,21 @@ export async function getStoreById(storeId: string) {
 
   if (error) {
     console.error('매장 상세 데이터 조회 에러:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getProfile(profileId: string) {
+  const supabase = await serverClient();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('profile_id', profileId)
+    .single();
+
+  if (error) {
+    console.error('프로필 데이터 조회 에러:', error);
     return null;
   }
   return data;
