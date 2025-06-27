@@ -72,7 +72,7 @@ export function ProfileImageUploader({
               alt="profile"
               width={100}
               height={100}
-              className="w-[100px] h-[100px] object-cover bg-gray-200"
+              className="w-[100px] h-[100px] object-cover bg-gray-200 rounded-full"
             />
           )}
         </Button>
