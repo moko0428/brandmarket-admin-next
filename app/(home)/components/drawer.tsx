@@ -48,9 +48,11 @@ export default function Drawer({ children }: DrawerProps) {
   useEffect(() => {
     if (!dragging) return;
 
+    const currentStartY = startY.current;
+
     const move = (e: PointerEvent) => {
-      if (startY.current == null) return;
-      const delta = e.clientY - startY.current;
+      if (currentStartY == null) return;
+      const delta = e.clientY - currentStartY;
       setDragY(delta);
     };
 
@@ -80,6 +82,7 @@ export default function Drawer({ children }: DrawerProps) {
 
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+
     return () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
@@ -124,10 +127,7 @@ export default function Drawer({ children }: DrawerProps) {
           flexDirection: 'column',
         }}
       >
-        <div
-          // onPointerDown={onHandlePointerDown}
-          className="flex justify-center py-3 flex-shrink-0 cursor-grab active:cursor-grabbing"
-        >
+        <div className="flex justify-center py-3 flex-shrink-0 cursor-grab active:cursor-grabbing">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
