@@ -11,19 +11,17 @@ import { updateProfile, getProfile } from './action';
 import { toast } from 'sonner';
 import { browserClient } from '@/lib/supabase/client';
 import { Tables } from '@/database.types';
-import { useRouter } from 'next/navigation';
 
 type Profile = Tables<'profiles'>;
 
 export default function ProfilePage() {
-  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [locationName, setLocationName] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
 
-  // 현재 사용자 ID 가져오기 및 인증 확인
+  // 현재 사용자 ID 가져오기 (미들웨어에서 이미 인증 확인됨)
   useEffect(() => {
     const getCurrentUser = async () => {
       const supabase = browserClient();
@@ -33,15 +31,10 @@ export default function ProfilePage() {
 
       if (user) {
         setCurrentUserId(user.id);
-      } else {
-        // 로그인되지 않은 경우 홈페이지로 리다이렉트
-        toast.error('로그인이 필요합니다.');
-        router.push('/');
-        return;
       }
     };
     getCurrentUser();
-  }, [router]);
+  }, []);
 
   // 프로필 데이터 로드
   useEffect(() => {
