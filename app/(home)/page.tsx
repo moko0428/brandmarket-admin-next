@@ -493,7 +493,7 @@ export default function LocationPage() {
 
       {/* Sheet 컴포넌트 */}
       <StoreDetailSheet
-        id={Number(selectedStore?.store_id) || 0}
+        store={selectedStore}
         onClose={() => setSelectedStore(null)}
         isOpen={!!selectedStore}
       />
