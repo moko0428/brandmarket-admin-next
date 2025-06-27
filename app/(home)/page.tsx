@@ -69,9 +69,7 @@ export default function LocationPage() {
   const [selectedKeyword, setSelectedKeyword] = useAtom(selectedKeywordAtom);
   const [drawerOpen, setDrawerOpen] = useAtom(drawerOpenAtom);
   const [isLoadingStores, setIsLoadingStores] = useState(true);
-  const [adminAvatar, setAdminAvatar] = useState<string>(
-    '/brandmarket_logo.png'
-  );
+  const [, setAdminAvatar] = useState<string>('/brandmarket_logo.png');
 
   // Supabase에서 매장 데이터 로드
   useEffect(() => {
@@ -358,7 +356,7 @@ export default function LocationPage() {
                   <div className="relative bg-white w-[180px] h-[80px] rounded-lg shadow-lg translate-x-2 -translate-y-20 border-2 border-gray-200">
                     <div className="rounded-lg p-2 flex items-center justify-center gap-2">
                       <Image
-                        src={adminAvatar}
+                        src={'/brandmarket_logo.png'}
                         alt="brandmarket_logo"
                         width={48}
                         height={48}
