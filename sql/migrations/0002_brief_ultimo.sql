@@ -1,0 +1,1 @@
+ALTER TABLE "stores" ADD COLUMN "directions" text[] NOT NULL;

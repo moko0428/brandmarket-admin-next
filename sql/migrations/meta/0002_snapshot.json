@@ -1,6 +1,6 @@
 {
-  "id": "4d1818ca-9ee0-4adb-a467-c27413676759",
-  "prevId": "057d7dfe-bc76-470b-a04b-069b53da0b30",
+  "id": "979272ab-f323-4c6b-89de-ade6a1114c44",
+  "prevId": "4d1818ca-9ee0-4adb-a467-c27413676759",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -221,12 +221,6 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "branch": {
-          "name": "branch",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "address": {
           "name": "address",
           "type": "text",
@@ -292,6 +286,18 @@
         "profile_id": {
           "name": "profile_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "branch": {
+          "name": "branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "directions": {
+          "name": "directions",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": true
         }

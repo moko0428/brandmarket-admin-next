@@ -8,6 +8,8 @@ interface InputPairProps {
   id: string;
   label?: string;
   value?: string;
+  name?: string;
+  type?: string;
   onChange?: (value: string) => void;
   className?: string;
   placeholder?: string;
@@ -17,7 +19,9 @@ export function InputPair({
   id,
   label,
   value,
+  name,
   onChange,
+  type,
   className,
   placeholder,
 }: InputPairProps) {
@@ -40,6 +44,8 @@ export function InputPair({
       <Input
         id={id}
         value={value}
+        name={name}
+        type={type}
         onChange={(e) => onChange?.(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

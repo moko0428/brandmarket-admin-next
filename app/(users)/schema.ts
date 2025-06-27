@@ -28,17 +28,19 @@ export const profiles = pgTable('profiles', {
 
 export const stores = pgTable('stores', {
   store_id: uuid().primaryKey().defaultRandom(),
-  address: text(),
-  open_time: text(),
-  close_time: text(),
-  latitude: text(),
-  longitude: text(),
-  location: text(),
-  description: text(),
-  store_image: text(),
+  address: text().notNull(),
+  open_time: text().notNull(),
+  close_time: text().notNull(),
+  latitude: text().notNull(),
+  longitude: text().notNull(),
+  location: text().notNull(),
+  description: text().notNull(),
+  store_image: text().notNull(),
   created_at: timestamp().defaultNow().notNull(),
   updated_at: timestamp().defaultNow().notNull(),
   profile_id: uuid()
     .notNull()
     .references(() => profiles.profile_id, { onDelete: 'cascade' }),
+  branch: text().notNull(),
+  directions: text().array().notNull().default(['']),
 });

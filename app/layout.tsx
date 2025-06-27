@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import Script from 'next/script';
 import { Toaster } from 'sonner';
 import { serverClient } from '@/lib/supabase/server';
+import { Providers } from '@/common/providers';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -42,11 +43,24 @@ export default async function RootLayout({
   const referer = headersList.get('referer') || '';
   const shouldShowNavigation = !referer.includes('/auth/login/a');
 
+  const supabase = await serverClient();
   const {
     data: { user },
-  } = await (await serverClient()).auth.getUser();
+  } = await supabase.auth.getUser();
+
+  // 사용자 프로필 정보 가져오기
+  let userProfile = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('profile_id', user.id)
+      .single();
+    userProfile = profile;
+  }
+
   const isLoggedIn = !!user;
-  console.log('isLoggedIn', user?.role);
+
   return (
     <html lang="ko">
       <head>
@@ -80,13 +94,15 @@ export default async function RootLayout({
         {shouldShowNavigation && (
           <Navigation
             isLoggedIn={isLoggedIn}
-            avatar="https://github.com/shadcn.png"
-            name="Brand Market"
-            storename="홍대1호점"
-            role="관리자"
+            avatar={userProfile?.avatar || ''}
+            name={userProfile?.location_name}
+            storename={userProfile?.location_name}
+            role={userProfile?.role}
           />
         )}
-        <div className="border-x-neutral-100 h-full w-full">{children}</div>
+        <Providers>
+          <div className="border-x-neutral-100 h-full w-full">{children}</div>
+        </Providers>
         <Toaster position="top-center" richColors />
       </body>
     </html>

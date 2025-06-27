@@ -11,7 +11,16 @@ const withPWA = nextPWA({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 다른 Next.js 설정들
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'fdnctbtuvasfqulmglpg.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
 };
 
 module.exports = withPWA(nextConfig);

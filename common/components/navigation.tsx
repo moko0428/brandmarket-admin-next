@@ -32,11 +32,11 @@ export default function Navigation({
   storename,
   role,
 }: {
-  isLoggedIn: boolean;
-  avatar: string;
-  name: string;
-  storename: string;
-  role: string;
+  isLoggedIn?: boolean;
+  avatar?: string;
+  name?: string;
+  storename?: string;
+  role?: string;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isDialogOpen, openLogoutDialog, closeLogoutDialog, handleLogout } =

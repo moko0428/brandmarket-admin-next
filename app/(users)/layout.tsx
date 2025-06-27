@@ -23,7 +23,7 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider className="max-h-[calc(100vh-14rem)] overflow-hidden h-[calc(100vh-14rem)] min-h-full">
+    <SidebarProvider className="max-h-[calc(100vh-7rem)] overflow-hidden h-[calc(100vh-7rem)] min-h-full">
       <Sidebar variant="floating" className="pt-16">
         <SidebarHeader>BrandMarket</SidebarHeader>
         <SidebarContent>
@@ -32,6 +32,14 @@ export default function ProfileLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/profile">
+                    <ShoppingBagIcon className="mr-2 h-4 w-4" />
+                    프로필
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/store">
                     <ShoppingBagIcon className="mr-2 h-4 w-4" />
                     매장 정보 관리
                   </Link>
