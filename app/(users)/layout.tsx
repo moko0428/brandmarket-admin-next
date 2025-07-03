@@ -39,9 +39,9 @@ export default async function ProfileLayout({
   const userProfile = Array.isArray(profile) ? profile[0] : profile;
 
   return (
-    <SidebarProvider className="max-h-[calc(100vh-7rem)] overflow-hidden h-[calc(100vh-7rem)] min-h-full">
+    <SidebarProvider className="max-h-[calc(100vh)] overflow-hidden h-[calc(100vh-2rem)] min-h-full">
       {/* 모바일 헤더 */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b z-40 flex items-center px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-12 bg-white border-b z-40 flex items-center px-4">
         {userProfile?.role === 'admin' && <MobileSidebarSheet />}
         <div className="ml-4 font-semibold">
           {userProfile?.role === 'admin'

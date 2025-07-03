@@ -92,14 +92,16 @@ export default async function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        {shouldShowNavigation && (
-          <Navigation
-            isLoggedIn={isLoggedIn}
-            avatar={userProfile?.avatar || ''}
-            name={userProfile?.location_name}
-            role={userProfile?.role}
-          />
-        )}
+        <div className="hidden md:block">
+          {shouldShowNavigation && (
+            <Navigation
+              isLoggedIn={isLoggedIn}
+              avatar={userProfile?.avatar || ''}
+              name={userProfile?.location_name}
+              role={userProfile?.role}
+            />
+          )}
+        </div>
         <Providers>
           <div className="border-x-neutral-100 h-full w-full">{children}</div>
         </Providers>
