@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import MobileSidebarSheet from './profile/components/mobile-sidebar-sheet';
 
 export const metadata: Metadata = {
   title: 'Brand Market | 관리자 페이지',
@@ -36,10 +37,22 @@ export default async function ProfileLayout({
     .eq('profile_id', user?.user?.id || '');
 
   const userProfile = Array.isArray(profile) ? profile[0] : profile;
+
   return (
     <SidebarProvider className="max-h-[calc(100vh-7rem)] overflow-hidden h-[calc(100vh-7rem)] min-h-full">
-      <Sidebar variant="floating" className="pt-16">
-        <SidebarHeader className="pointer-events-none">
+      {/* 모바일 헤더 */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b z-40 flex items-center px-4">
+        {userProfile?.role === 'admin' && <MobileSidebarSheet />}
+        <div className="ml-4 font-semibold">
+          {userProfile?.role === 'admin'
+            ? 'BrandMarket 관리자'
+            : `@${userProfile?.location_name}` || '사용자'}
+        </div>
+      </div>
+
+      {/* 데스크톱 사이드바 */}
+      <Sidebar variant="floating" className="pt-16 md:pt-0">
+        <SidebarHeader className="pointer-events-none hidden md:block">
           {userProfile?.role === 'admin'
             ? 'BrandMarket 관리자'
             : userProfile?.location_name || '사용자'}
@@ -91,7 +104,11 @@ export default async function ProfileLayout({
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <div className="py-0 md:py-4 px-0 h-screen w-full">{children}</div>
+
+      {/* 메인 콘텐츠 */}
+      <div className="py-0 md:py-4 px-0 h-screen w-full md:pt-0 pt-16">
+        {children}
+      </div>
     </SidebarProvider>
   );
 }

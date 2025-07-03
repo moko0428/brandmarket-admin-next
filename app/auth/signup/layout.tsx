@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Brand Market | 관리자 로그인',
+  title: 'Brand Market | 회원가입',
   description: 'Brand Market',
 };
 
-export default function ProfileLayout({
+export default function SignupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="h-full flex flex-col">{children}</div>;
+  return <div className="h-full">{children}</div>;
 }
