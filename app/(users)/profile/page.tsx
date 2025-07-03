@@ -6,20 +6,25 @@ import { Separator } from '@/common/components/ui/separator';
 import { Label } from '@/common/components/ui/label';
 import { Input } from '@/common/components/ui/input';
 import { Button } from '@/common/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { updateProfile, getProfile } from './action';
 import { toast } from 'sonner';
 import { browserClient } from '@/lib/supabase/client';
 import { Tables } from '@/database.types';
+import { useRouter } from 'next/navigation';
+import { deleteAccountAction } from '@/app/auth/logout/action';
 
 type Profile = Tables<'profiles'>;
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [locationName, setLocationName] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   // 현재 사용자 ID 가져오기 (미들웨어에서 이미 인증 확인됨)
   useEffect(() => {
@@ -95,8 +100,24 @@ export default function ProfilePage() {
     );
   }
 
+  const handleLogout = async () => {
+    const supabase = browserClient();
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+  const handleDeleteAccount = () => {
+    setShowAlert(true);
+  };
+
+  const confirmDelete = () => {
+    setShowAlert(false);
+    startTransition(async () => {
+      await deleteAccountAction();
+      // redirect가 실행되므로 이후 코드는 실행되지 않음
+    });
+  };
   return (
-    <div className="px-5 h-[calc(100vh-100px)] flex flex-col pb-10">
+    <div className="px-5 h-full flex flex-col pb-20">
       <Hero title="프로필" subtitle="프로필을 관리할 수 있습니다." />
 
       <div className="flex-1 space-y-6">
@@ -148,9 +169,60 @@ export default function ProfilePage() {
             >
               프로필 저장
             </Button>
+            <div className="flex gap-2 w-full -mt-2">
+              <Button
+                variant="outline"
+                className="w-full flex-1"
+                onClick={handleLogout}
+                disabled={!currentUserId}
+              >
+                로그아웃
+              </Button>
+              <Button
+                variant="destructive"
+                className="w-full flex-1"
+                onClick={handleDeleteAccount}
+                disabled={isPending}
+              >
+                회원탈퇴
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      {/* 회원탈퇴 확인 모달 */}
+      {showAlert && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
+            <div className="text-lg font-bold text-red-600 mb-2">
+              정말 탈퇴하시겠습니까?
+            </div>
+            <div className="mb-4 text-sm text-gray-700">
+              탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.
+              <br />
+              정말로 회원 탈퇴를 진행하시겠습니까?
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={confirmDelete}
+                disabled={isPending}
+              >
+                네, 탈퇴합니다
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowAlert(false)}
+                disabled={isPending}
+              >
+                취소
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
