@@ -3,7 +3,7 @@
 import { Hero } from '@/common/components/hero';
 import { InputPair } from '@/common/components/input-pair';
 import { Button } from '@/common/components/ui/button';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { loginAction } from './action';
 import Link from 'next/link';
 import {
@@ -13,9 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/common/components/ui/card';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(loginAction, { error: '' });
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.error('로그인 실패', {
+        description: state.error,
+      });
+    }
+  }, [state?.error]);
 
   return (
     <div className="flex flex-col justify-center h-full">
@@ -57,17 +66,18 @@ export default function LoginPage() {
                   </span>
                 )}
               </div>
-              {state?.error && !state.error.includes('입력') && (
-                <span className="text-sm text-red-500">{state.error}</span>
-              )}
+
               <Button className="w-full" type="submit">
                 로그인
               </Button>
             </form>
-            <div className="text-center pt-10">
+            <div className="text-center mt-4">
               <p className="text-sm text-gray-600">
                 계정이 없으신가요?{' '}
-                <Link href="/auth/signup" className="text-sm">
+                <Link
+                  href="/auth/signup"
+                  className="text-sm text-muted-foreground"
+                >
                   <span className="underline text-blue-500">회원가입하기</span>
                 </Link>
               </p>

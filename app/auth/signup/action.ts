@@ -2,6 +2,7 @@
 
 import { signupSchema } from '@/lib/schemas';
 import { serverClient } from '@/lib/supabase/server';
+import { generateOTP, sendOTPEmail } from '../lib/email';
 
 // OTP 저장용 (실제로는 Redis나 데이터베이스 사용)
 const otpStore = new Map<
@@ -12,11 +13,6 @@ const otpStore = new Map<
     userData: { name: string; email: string; password: string };
   }
 >();
-
-// OTP 생성 함수
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
 
 // OTP 전송 액션
 export async function sendOTPAction(
@@ -52,11 +48,12 @@ export async function sendOTPAction(
       userData: { name, email, password },
     });
 
-    // 개발 환경에서는 콘솔에 출력
-    console.log(`📧 OTP for ${email}: ${otp}`);
+    // 실제 이메일 전송
+    const emailResult = await sendOTPEmail(email, otp, name);
 
-    // 실제 프로덕션에서는 Supabase Edge Functions나 외부 이메일 서비스 사용
-    // 여기서는 개발용으로 콘솔 출력만 함
+    if (!emailResult.success) {
+      return { error: '인증 코드 전송에 실패했습니다. 다시 시도해주세요.' };
+    }
 
     return { error: '', success: true, email };
   } catch (error) {
@@ -123,7 +120,7 @@ export async function resendEmailAction(
     // 새로운 OTP 생성
     const otp = generateOTP();
 
-    // 기존 데이터 가져오기 (실제로는 더 안전한 방법 사용)
+    // 기존 데이터 가져오기
     const storedData = otpStore.get(email);
     if (!storedData) {
       return { error: '인증 정보를 찾을 수 없습니다. 다시 시도해주세요.' };
@@ -136,9 +133,12 @@ export async function resendEmailAction(
       userData: storedData.userData,
     });
 
-    // 이메일 재전송
-    // 실제 프로덕션에서는 Supabase Edge Functions나 외부 이메일 서비스 사용
-    // 여기서는 개발용으로 콘솔 출력만 함
+    // 실제 이메일 재전송
+    const emailResult = await sendOTPEmail(email, otp, name);
+
+    if (!emailResult.success) {
+      return { error: '인증 코드 재전송에 실패했습니다.' };
+    }
 
     return { error: '', success: true };
   } catch (error) {
@@ -189,11 +189,36 @@ export async function signupAction(
     if (authError) {
       console.error('회원가입 에러:', authError);
 
-      if (authError.message.includes('already registered')) {
+      // Supabase 에러 한글화
+      if (
+        authError.message.includes('already registered') ||
+        authError.message.includes('User already registered')
+      ) {
         return { error: '이미 가입된 이메일입니다.' };
       }
 
-      return { error: authError.message || '회원가입 중 오류가 발생했습니다.' };
+      if (
+        authError.code === 'over_email_send_rate_limit' ||
+        authError.message.includes('seconds')
+      ) {
+        const seconds = authError.message.match(/(\d+) seconds/)?.[1] || '60';
+        return {
+          error: `이메일 전송 제한에 도달했습니다. ${seconds}초 후에 다시 시도해주세요.`,
+        };
+      }
+
+      if (authError.code === 'weak_password') {
+        return {
+          error:
+            '비밀번호가 너무 약합니다. 영문자와 숫자를 포함하여 6자 이상 입력해주세요.',
+        };
+      }
+
+      if (authError.code === 'invalid_signup_credentials') {
+        return { error: '회원가입 정보가 올바르지 않습니다.' };
+      }
+
+      return { error: '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.' };
     }
 
     if (authData.user) {
@@ -207,6 +232,16 @@ export async function signupAction(
 
       if (profileError) {
         console.error('프로필 생성 에러:', profileError);
+
+        // 프로필 에러 한글화
+        if (profileError.code === '23505') {
+          return { error: '이미 존재하는 프로필입니다.' };
+        }
+
+        if (profileError.code === '23503') {
+          return { error: '사용자 정보를 찾을 수 없습니다.' };
+        }
+
         // 프로필 생성 실패해도 회원가입은 성공으로 처리
       }
 

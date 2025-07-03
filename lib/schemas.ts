@@ -3,6 +3,12 @@ import { z } from 'zod';
 // 회원가입 스키마
 export const signupSchema = z
   .object({
+    location_name: z
+      .string()
+      .min(1, '이름을 입력해주세요.')
+      .min(2, '이름은 최소 2자 이상이어야 합니다.')
+      .max(50, '이름은 최대 50자까지 입력 가능합니다.')
+      .trim(),
     email: z
       .string()
       .min(1, '이메일을 입력해주세요.')
@@ -16,12 +22,6 @@ export const signupSchema = z
         '비밀번호는 영문자와 숫자를 포함해야 합니다.'
       ),
     password_confirm: z.string().min(1, '비밀번호 확인을 입력해주세요.'),
-    location_name: z
-      .string()
-      .min(1, '이름을 입력해주세요.')
-      .min(2, '이름은 최소 2자 이상이어야 합니다.')
-      .max(50, '이름은 최대 50자까지 입력 가능합니다.')
-      .trim(),
   })
   .refine((data) => data.password === data.password_confirm, {
     message: '비밀번호가 일치하지 않습니다.',

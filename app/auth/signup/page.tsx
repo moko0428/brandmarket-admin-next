@@ -229,9 +229,10 @@ export default function SignupPage() {
             <div className="mt-4 text-center">
               <Link
                 href="/auth/login"
-                className="text-sm text-muted-foreground hover:underline"
+                className="text-sm text-muted-foreground"
               >
-                이미 계정이 있으신가요? 로그인
+                이미 계정이 있으신가요?{' '}
+                <span className="underline text-blue-500">로그인</span>
               </Link>
             </div>
           </CardContent>
