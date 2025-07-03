@@ -431,7 +431,7 @@ export default function LocationPage() {
         {/* Drawer 열기 버튼 – Drawer 열리면 숨김 */}
         <button
           onClick={() => setDrawerOpen(true)}
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 bg-white shadow-xl border-2 border-gray-200 hover:bg-gray-50 rounded-full h-10 px-4 flex items-center gap-2
+          className="fixed bottom-15 left-1/2 -translate-x-1/2 z-40 bg-white shadow-xl border-2 border-gray-200 hover:bg-gray-50 rounded-full h-10 px-4 flex items-center gap-2
                      data-[open=true]:hidden"
           data-open={drawerOpen}
         >
