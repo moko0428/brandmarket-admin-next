@@ -27,7 +27,13 @@ export async function loginAction(
 
   if (error) {
     console.log('error', error);
-    return { error: error.message };
+
+    // 이메일 미확인 에러 처리
+    if (error.code === 'email_not_confirmed') {
+      return { error: '이메일이 확인되지 않았습니다. 이메일을 확인해주세요.' };
+    }
+
+    return { error: error.message || '로그인 중 오류가 발생했습니다.' };
   }
   console.log('success', email, password);
   redirect('/profile');
