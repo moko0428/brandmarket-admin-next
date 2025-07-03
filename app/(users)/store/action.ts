@@ -97,8 +97,6 @@ export async function addStore(
 }
 
 export async function uploadStoreImage(file: File, storeId: string) {
-  'use server';
-
   const supabase = await serverClient();
 
   const fileExt = file.name.split('.').pop();

@@ -14,8 +14,8 @@ export function Hero({ title, subtitle, className }: HeroProps) {
         className
       )}
     >
-      <h1 className="text-4xl font-bold">{title}</h1>
-      <p className="text-xl font-light text-foreground">{subtitle}</p>
+      <h1 className="text-xl font-bold">{title}</h1>
+      <p className="text-lg font-light text-foreground">{subtitle}</p>
     </div>
   );
 }

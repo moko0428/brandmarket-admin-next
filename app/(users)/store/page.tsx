@@ -263,9 +263,9 @@ export default function StorePage() {
   }
 
   return (
-    <div className="px-5 h-[calc(100vh-100px)] flex flex-col pb-10">
+    <div className="px-5 h-[calc(100vh-100px)] flex flex-col pb-20">
       <Hero title="매장 정보 관리" subtitle="매장 정보를 관리할 수 있습니다." />
-      <aside className="grid grid-cols-4 gap-4 flex-1 min-h-0">
+      <aside className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 min-h-0">
         <div className="flex flex-col gap-2 col-span-1">
           <div className="flex justify-between items-center">
             <h2>매장 리스트</h2>
@@ -346,7 +346,7 @@ export default function StorePage() {
           </div>
         </div>
 
-        <div className="col-span-3 overflow-y-auto space-y-4">
+        <div className="col-span-1 md:col-span-3 overflow-y-auto space-y-4">
           <div>
             <h2>매장 정보</h2>
             <Separator />
@@ -354,7 +354,7 @@ export default function StorePage() {
 
           {selectedStoreData ? (
             <div className="space-y-4 pb-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StoreImageUploader
                   storeId={selectedStoreData.store_id}
                   currentImageUrl={selectedStoreData.store_image}
