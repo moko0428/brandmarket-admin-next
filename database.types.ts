@@ -16,6 +16,7 @@ export type Database = {
           location_name: string
           profile_id: string
           role: Database["public"]["Enums"]["role"]
+          updated_at: string | null
           updatedAt: string
         }
         Insert: {
@@ -24,6 +25,7 @@ export type Database = {
           location_name: string
           profile_id: string
           role?: Database["public"]["Enums"]["role"]
+          updated_at?: string | null
           updatedAt?: string
         }
         Update: {
@@ -32,6 +34,7 @@ export type Database = {
           location_name?: string
           profile_id?: string
           role?: Database["public"]["Enums"]["role"]
+          updated_at?: string | null
           updatedAt?: string
         }
         Relationships: []
