@@ -128,7 +128,7 @@ export default function Drawer({ children }: DrawerProps) {
         }}
       >
         <div className="flex justify-center py-3 flex-shrink-0 cursor-grab active:cursor-grabbing">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+          <div className="w-20 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>

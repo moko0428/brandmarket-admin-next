@@ -6,7 +6,7 @@ import Script from 'next/script';
 import { Toaster } from 'sonner';
 import { serverClient } from '@/lib/supabase/server';
 import { Providers } from '@/common/providers';
-import BottomBar from '@/common/components/bottom-bar';
+// import BottomBar from '@/common/components/bottom-bar';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -91,8 +91,8 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning>
-        <div className="hidden md:block">
+      <body suppressHydrationWarning className="md:pt-16">
+        <div className="">
           {shouldShowNavigation && (
             <Navigation
               isLoggedIn={isLoggedIn}
@@ -106,7 +106,7 @@ export default async function RootLayout({
           <div className="border-x-neutral-100 h-full w-full">{children}</div>
         </Providers>
         <Toaster position="top-center" richColors />
-        <BottomBar />
+        {/* <BottomBar /> */}
       </body>
     </html>
   );
