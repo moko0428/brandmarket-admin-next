@@ -7,8 +7,8 @@ import { browserClient } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 
 const menus = [
-  { id: 1, name: <HomeIcon />, href: '/list' },
-  { id: 2, name: <MapIcon />, href: '/' },
+  { id: 1, name: <HomeIcon />, href: '/' },
+  { id: 2, name: <MapIcon />, href: '/map' },
   { id: 3, name: <UserIcon />, href: '/profile' },
 ];
 
@@ -61,8 +61,8 @@ export default function BottomBar() {
     if (href === '/') {
       return pathname === '/';
     }
-    if (href === '/list') {
-      return pathname === '/list';
+    if (href === '/map') {
+      return pathname === '/map';
     }
     if (href === '/profile') {
       return pathname === '/profile';
@@ -70,46 +70,29 @@ export default function BottomBar() {
     return false;
   };
 
-  // 마운트 전에는 기본 스타일로 렌더링
-  if (!mounted) {
-    return (
-      <nav className="fixed bottom-0 left-0 right-0 h-[50px] z-50 bg-white w-full border-t block md:hidden">
-        <div className="w-full h-full flex justify-between items-center px-5">
-          {menus.map((menu) => (
-            <Link
-              key={menu.id}
-              href={menu.href}
-              className="flex-1 h-full flex items-center justify-center text-sm font-medium text-gray-600 transition-colors"
-            >
-              {menu.name}
-            </Link>
-          ))}
-        </div>
-      </nav>
-    );
-  }
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-[50px] z-50 bg-white w-full border-t block md:hidden">
-      <div className="w-full h-full flex justify-between items-center px-5">
-        {menus.map((menu) => {
-          const isActive = isActiveMenu(menu.href);
+    <nav className="fixed bottom-0 left-0 right-0 h-16 flex max-w-screen-md mx-auto items-center border-t z-50 bg-white">
+      <div className="w-full h-full">
+        <div className="max-w-screen-md mx-auto flex justify-between items-center px-5 h-full">
+          {menus.map((menu) => {
+            const isActive = isActiveMenu(menu.href);
 
-          return (
-            <Link
-              key={menu.id}
-              href={menu.href}
-              onClick={(e) => handleProfileClick(e, menu.href)}
-              className={`flex-1 h-full flex items-center justify-center text-sm font-medium transition-colors rounded-lg ${
-                isActive
-                  ? 'bg-gray-200 text-gray-900' // 활성화된 메뉴: 어두운 배경
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' // 비활성화된 메뉴
-              }`}
-            >
-              {menu.name}
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={menu.id}
+                href={menu.href}
+                onClick={(e) => handleProfileClick(e, menu.href)}
+                className={`flex-1 h-full flex items-center justify-center text-sm font-medium transition-colors rounded-lg ${
+                  isActive
+                    ? 'bg-gray-200 text-gray-900' // 활성화된 메뉴: 어두운 배경
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' // 비활성화된 메뉴
+                }`}
+              >
+                {menu.name}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

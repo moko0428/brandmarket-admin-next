@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navigation from '@/common/components/navigation';
-import { headers } from 'next/headers';
 import Script from 'next/script';
 import { Toaster } from 'sonner';
-import { serverClient } from '@/lib/supabase/server';
-import { Providers } from '@/common/providers';
-// import BottomBar from '@/common/components/bottom-bar';
+import BottomBar from '@/common/components/bottom-bar';
+import Container from '@/common/components/container';
 
 export const metadata: Metadata = {
   title: 'Brand Market',
@@ -40,28 +38,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const referer = headersList.get('referer') || '';
-  const shouldShowNavigation = !referer.includes('/auth/login/a');
-
-  const supabase = await serverClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // 사용자 프로필 정보 가져오기
-  let userProfile = null;
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('profile_id', user.id)
-      .single();
-    userProfile = profile;
-  }
-
-  const isLoggedIn = !!user;
-
   return (
     <html lang="ko">
       <head>
@@ -91,22 +67,13 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className="md:pt-16">
-        <div className="">
-          {shouldShowNavigation && (
-            <Navigation
-              isLoggedIn={isLoggedIn}
-              avatar={userProfile?.avatar || ''}
-              name={userProfile?.location_name}
-              role={userProfile?.role}
-            />
-          )}
-        </div>
-        <Providers>
-          <div className="border-x-neutral-100 h-full w-full">{children}</div>
-        </Providers>
-        <Toaster position="top-center" richColors />
-        {/* <BottomBar /> */}
+      <body suppressHydrationWarning>
+        <Navigation />
+        <Container>
+          {children}
+          <Toaster position="top-center" richColors />
+        </Container>
+        <BottomBar />
       </body>
     </html>
   );
