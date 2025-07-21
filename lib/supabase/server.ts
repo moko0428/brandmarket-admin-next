@@ -1,9 +1,27 @@
 import { createServerClient } from '@supabase/ssr';
-import { MergeDeep } from 'type-fest';
+import { MergeDeep, SetNonNullable } from 'type-fest';
 import { Database as SupabaseDatabase } from '@/database.types';
 import { cookies } from 'next/headers';
 
-export type Database = MergeDeep<SupabaseDatabase, Record<string, never>>;
+export type Database = MergeDeep<
+  SupabaseDatabase,
+  {
+    public: {
+      Views: {
+        profiles: {
+          Row: SetNonNullable<
+            SupabaseDatabase['public']['Tables']['profiles']['Row']
+          >;
+        };
+      };
+      Tables: {
+        profiles: {
+          Row: SupabaseDatabase['public']['Tables']['profiles']['Row'];
+        };
+      };
+    };
+  }
+>;
 
 export async function serverClient() {
   const cookieStore = await cookies();
