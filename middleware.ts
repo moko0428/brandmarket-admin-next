@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
   // 프로필 페이지만 보호
   if (pathname === '/profile' && !isLoggedIn) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/auth/login';
     return NextResponse.redirect(url);
   }
 
