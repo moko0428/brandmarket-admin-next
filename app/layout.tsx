@@ -70,7 +70,7 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <Navigation />
         <Container>
-          {children}
+          <div className="pt-14">{children}</div>
           <Toaster position="top-center" richColors />
         </Container>
         <BottomBar />
