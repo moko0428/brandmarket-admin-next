@@ -35,7 +35,7 @@ export default function ProductPage() {
         title="재고 관리"
         subtitle="재고 관리 테이블을 통해 재고를 관리합니다."
       />
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col col-span-2 justify-between bg-gray-100 p-4 rounded-lg">
           <div className="flex justify-between gap-2 border-b-2 border-gray-200 pb-2">
             <div>품명</div>

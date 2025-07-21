@@ -84,7 +84,7 @@ export default function EditTable() {
         <small>영수증의 품목, 단가, 수량, 총 금액을 추출합니다.</small>
         <small>촬영 후 텍스트 분석을 눌러 텍스트 분석을 진행하세요.</small>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className=" gap-4">
         <div>
           {!showCamera && !isLoading && (
             <div className="flex gap-4">
