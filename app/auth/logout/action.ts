@@ -61,7 +61,7 @@ export async function deleteAccountAction() {
     await supabase.auth.signOut();
 
     // 메인 페이지로 이동
-    redirect('/?message=회원탈퇴가 완료되었습니다.');
+    redirect('/');
   } catch (error) {
     console.error('회원탈퇴 처리 중 오류:', error);
     return { error: '회원탈퇴 처리 중 오류가 발생했습니다.' };

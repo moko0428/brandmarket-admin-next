@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Brand Market | 관리자 로그인',
+  title: 'Brand Market | 로그인',
   description: 'Brand Market',
 };
 
-export default function ProfileLayout({
+export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode;
