@@ -10,7 +10,7 @@ export function Hero({ title, subtitle, className }: HeroProps) {
   return (
     <div
       className={cn(
-        'flex flex-col py-10 justify-center items-center rounded-md bg-gradient-to-t from-background to-primary/10',
+        'flex flex-col justify-center items-center bg-gradient-to-t from-background to-primary/10 py-6',
         className
       )}
     >
