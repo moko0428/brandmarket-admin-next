@@ -2,17 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Hero } from '@/common/components/hero';
-import { Button } from '@/common/components/ui/button';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/common/components/ui/tabs';
-import { Plus } from 'lucide-react';
-import { PostList } from './components/post-list';
+import { PostList } from './(users)/posts/components/post-list';
 import { browserClient } from '@/lib/supabase/client';
-import Link from 'next/link';
 
 export default function PostsPage() {
   const [userRole, setUserRole] = useState<'admin' | 'manager' | 'user'>(
@@ -61,16 +58,10 @@ export default function PostsPage() {
   }
 
   return (
-    <div className="px-4 md:px-10 py-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+    <div className="px-10 py-6">
+      <div className="">
+        <div className="flex flex-col justify-between mb-6">
           <Hero title="게시물" subtitle="사진과 상품을 공유해보세요" />
-          <Link href="/posts/create">
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              게시물 작성
-            </Button>
-          </Link>
         </div>
 
         <Tabs defaultValue="all" className="w-full">

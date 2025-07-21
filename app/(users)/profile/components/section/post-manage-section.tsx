@@ -6,7 +6,7 @@ export default function PostManageSection() {
   return (
     <div className="flex flex-col items-center gap-2">
       <Button variant={'link'} className="flex flex-col">
-        <Link href="/product" className="flex flex-col items-center gap-2">
+        <Link href="/posts" className="flex flex-col items-center gap-2">
           <StickyNoteIcon className="size-12" />
           포스트
         </Link>

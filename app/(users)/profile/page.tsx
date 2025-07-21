@@ -8,16 +8,14 @@ import { browserClient } from '@/lib/supabase/client';
 import { Tables } from '@/database.types';
 import { getProfile } from './action';
 import ProfileSection from './components/section/profile-section';
-import ManageSectionContainer from './components/section/manage-section-container';
 import StoreManageSection from './components/section/store-manage-section';
 // import InventorySection from './components/section/inventory-section';
 // import MemberSection from './components/section/member-section';
-import PostManageSection from './components/section/post-manage-section';
-import PostSection from './components/section/post-section';
 import EditProfileSheet from './components/sheet/edit-profile-sheet';
 import StoreManagementSheet from './components/sheet/store-management-sheet';
 // import MemberManageSheet from './components/sheet/member-manage-sheet';
 import { User } from '@supabase/supabase-js';
+import PostSection from './components/section/post-section';
 
 type Profile = Tables<'profiles'>;
 
@@ -105,15 +103,10 @@ export default function ProfilePage() {
         <Height height={20} />
       </div>
       {['admin', 'manager'].includes(profile?.role || '') && (
-        <ManageSectionContainer>
-          <StoreManageSection
-            setOpen={() => setOpen({ ...open, store: true })}
-          />
-          {/* <InventorySection /> */}
-          {/* <MemberSection setOpen={() => setOpen({ ...open, member: true })} /> */}
-          <PostManageSection />
-        </ManageSectionContainer>
+        <StoreManageSection setOpen={() => setOpen({ ...open, store: true })} />
       )}
+      {/* <InventorySection /> */}
+      {/* <MemberSection setOpen={() => setOpen({ ...open, member: true })} /> */}
       <Height height={20} />
 
       <PostSection />

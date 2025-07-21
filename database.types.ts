@@ -50,6 +50,107 @@ export type Database = {
           },
         ]
       }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          available_stores: Json | null
+          color: string | null
+          content: string | null
+          created_at: string
+          images: Json
+          is_published: boolean
+          like_count: number
+          post_id: string
+          post_type: string
+          price: number | null
+          product_name: string | null
+          size: string | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id: string
+          available_stores?: Json | null
+          color?: string | null
+          content?: string | null
+          created_at?: string
+          images?: Json
+          is_published?: boolean
+          like_count?: number
+          post_id?: string
+          post_type: string
+          price?: number | null
+          product_name?: string | null
+          size?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string
+          available_stores?: Json | null
+          color?: string | null
+          content?: string | null
+          created_at?: string
+          images?: Json
+          is_published?: boolean
+          like_count?: number
+          post_id?: string
+          post_type?: string
+          price?: number | null
+          product_name?: string | null
+          size?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar: string | null
