@@ -5,6 +5,8 @@ import {
   text,
   timestamp,
   uuid,
+  boolean,
+  serial,
 } from 'drizzle-orm/pg-core';
 
 const users = pgSchema('auth').table('users', {
@@ -14,7 +16,7 @@ const users = pgSchema('auth').table('users', {
 // 역할 enum
 export const roles = pgEnum('role', ['admin', 'manager', 'user']);
 
-// 기존 profiles 테이블
+// 기존 profiles 테이블 (is_banned 컬럼 추가)
 export const profiles = pgTable('profiles', {
   profile_id: uuid()
     .primaryKey()
@@ -22,10 +24,12 @@ export const profiles = pgTable('profiles', {
   avatar: text(),
   location_name: text().notNull(),
   role: roles('role').default('user').notNull(),
+  is_banned: boolean('is_banned').default(false), // 벤 처리 컬럼 추가
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
 
+// 기존 stores 테이블
 export const stores = pgTable('stores', {
   store_id: uuid().primaryKey().defaultRandom(),
   address: text().notNull(),
@@ -43,4 +47,16 @@ export const stores = pgTable('stores', {
     .references(() => profiles.profile_id, { onDelete: 'cascade' }),
   branch: text().notNull(),
   directions: text().array().notNull().default(['']),
+});
+
+// 매니저-매장 연결 테이블 추가
+export const branchManager = pgTable('branch_manager', {
+  id: serial('id').primaryKey(),
+  profile_id: uuid('profile_id').references(() => profiles.profile_id, {
+    onDelete: 'cascade',
+  }),
+  store_id: uuid('store_id').references(() => stores.store_id, {
+    onDelete: 'cascade',
+  }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
 });
