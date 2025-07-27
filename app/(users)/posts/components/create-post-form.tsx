@@ -34,6 +34,11 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
 
+  // URL 파라미터에 따른 게시물 타입 설정
+  const [forcedPostType, setForcedPostType] = useState<
+    'photo' | 'product' | null
+  >(null);
+
   // 공통 필드
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -52,10 +57,35 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   const isAdmin = userRole === 'admin';
+  const isManager = userRole === 'manager';
+  const canCreateProduct = isAdmin || isManager;
 
-  // 매장 목록 로드 (어드민만)
+  // URL 파라미터 확인
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+
+    if (type === 'photo') {
+      setForcedPostType('photo');
+    } else if (type === 'product' && canCreateProduct) {
+      setForcedPostType('product');
+    }
+  }, [canCreateProduct]);
+
+  // 실제 표시할 게시물 타입 결정
+  const getDisplayPostType = () => {
+    if (forcedPostType === 'photo') return 'photo';
+    if (forcedPostType === 'product' && canCreateProduct) return 'product';
+    if (canCreateProduct) return 'product'; // 기본적으로 admin/manager는 상품 게시물
+    return 'photo'; // 일반 사용자는 사진 게시물
+  };
+
+  const displayPostType = getDisplayPostType();
+  const isProductPost = displayPostType === 'product';
+
+  // 매장 목록 로드 (상품 게시물일 때만)
   const loadStores = useCallback(async () => {
-    if (!isAdmin) return;
+    if (!isProductPost) return;
 
     console.log('매장 목록 로딩 시작...');
     setLoadingStores(true);
@@ -77,9 +107,9 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
     } finally {
       setLoadingStores(false);
     }
-  }, [isAdmin]);
+  }, [isProductPost]);
 
-  // 컴포넌트 마운트 시 매장 목록 로드 (의존성 배열 추가)
+  // 컴포넌트 마운트 시 매장 목록 로드
   useEffect(() => {
     loadStores();
   }, [loadStores]);
@@ -101,7 +131,10 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
       try {
         const formData = new FormData();
         files.forEach((file) => formData.append('files', file));
-        formData.append('postType', isAdmin ? 'admin_product' : 'user_photo');
+        formData.append(
+          'postType',
+          isProductPost ? 'admin_product' : 'user_photo'
+        );
 
         const response = await fetch('/api/posts/images', {
           method: 'POST',
@@ -126,7 +159,7 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
         e.target.value = ''; // 파일 입력 초기화
       }
     },
-    [images.length, isAdmin]
+    [images.length, isProductPost]
   );
 
   // 이미지 제거
@@ -162,8 +195,8 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
     try {
       let result;
 
-      if (isAdmin) {
-        // 어드민 게시물 유효성 검사
+      if (isProductPost) {
+        // 상품 게시물 유효성 검사
         if (!productName.trim()) {
           toast.error('상품명을 입력해주세요.');
           return;
@@ -196,6 +229,7 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
           available_stores: availableStores,
         });
       } else {
+        // 사진 게시물
         result = await createUserPost({
           title: title.trim(),
           content: content.trim() || undefined,
@@ -206,7 +240,7 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
       if (result.success) {
         toast.success('게시물이 성공적으로 작성되었습니다.');
         onSuccess?.();
-        router.push('/profile'); // 프로필 페이지로 리다이렉트
+        router.push('/profile');
       } else {
         toast.error(result.error || '게시물 작성에 실패했습니다.');
       }
@@ -223,7 +257,7 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ImageIcon className="w-5 h-5" />
-          {isAdmin ? '상품 게시물 작성' : '사진 게시물 작성'}
+          {isProductPost ? '상품 게시물 작성' : '사진 게시물 작성'}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -308,8 +342,8 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
               />
             </div>
 
-            {/* 익명 옵션 추가 (일반 사용자만) */}
-            {!isAdmin && (
+            {/* 익명 옵션 - 사진 게시물일 때만 표시 */}
+            {!isProductPost && (
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -325,8 +359,8 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
             )}
           </div>
 
-          {/* 어드민 전용 상품 정보 */}
-          {isAdmin && (
+          {/* 상품 정보 - 상품 게시물일 때만 표시 */}
+          {isProductPost && (
             <>
               <Separator />
               <div className="space-y-4">
@@ -433,7 +467,11 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || images.length === 0 || loadingStores}
+              disabled={
+                isSubmitting ||
+                images.length === 0 ||
+                (isProductPost && loadingStores)
+              }
               className="flex-1"
             >
               {isSubmitting ? '작성 중...' : '게시물 작성'}

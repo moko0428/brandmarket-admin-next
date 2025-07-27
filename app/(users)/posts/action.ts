@@ -39,10 +39,31 @@ async function getUserProfile(userId: string) {
   return profile;
 }
 
+// Ban 체크 함수
+async function checkUserBanStatus(userId: string) {
+  const supabase = await serverClient();
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('is_banned')
+    .eq('profile_id', userId)
+    .single();
+
+  if (error) {
+    throw new Error('사용자 정보를 확인할 수 없습니다.');
+  }
+
+  if (profile?.is_banned) {
+    throw new Error(
+      '관리자에 의해 계정이 비활성화되어 게시물을 작성할 수 없습니다.'
+    );
+  }
+}
+
 // 일반 사용자 게시물 생성
 export async function createUserPost(data: CreateUserPostData) {
   try {
     const user = await getCurrentUser();
+    await checkUserBanStatus(user.id); // Ban 상태 체크 추가
     const supabase = await serverClient();
 
     const { data: post, error } = await supabase
@@ -76,6 +97,7 @@ export async function createUserPost(data: CreateUserPostData) {
 export async function createAdminPost(data: CreateAdminPostData) {
   try {
     const user = await getCurrentUser();
+    await checkUserBanStatus(user.id); // Ban 상태 체크 추가
     const profile = await getUserProfile(user.id);
 
     if (profile.role !== 'admin') {
@@ -132,11 +154,12 @@ export async function getPosts(
       .select(
         `
         *,
-        author:profiles (
+        author:profiles!posts_author_id_profiles_profile_id_fk (
           profile_id,
           location_name,
           avatar,
-          role
+          role,
+          is_banned
         )
       `
       )
@@ -155,9 +178,14 @@ export async function getPosts(
       throw new Error(`게시물 조회 실패: ${error.message}`);
     }
 
+    // 벤된 사용자의 게시물 필터링
+    const filteredPosts = (posts || []).filter(
+      (post) => !post.author?.is_banned
+    );
+
     // 어드민 게시물의 경우 매장 정보도 가져오기
     const postsWithStores = await Promise.all(
-      (posts || []).map(async (post) => {
+      filteredPosts.map(async (post) => {
         if (
           post.post_type === 'admin_product' &&
           post.available_stores?.length > 0
@@ -474,6 +502,69 @@ export async function getUserPosts(
     return {
       success: false,
       error: error instanceof Error ? error.message : '게시물 조회 실패',
+    };
+  }
+}
+
+// 특정 매장의 상품 게시물 조회 (정책 불필요)
+export async function getStoreProducts(storeId: string) {
+  try {
+    const supabase = await serverClient();
+
+    // 모든 상품 게시물을 가져온 후 클라이언트에서 필터링
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select(
+        `
+        post_id,
+        title,
+        images,
+        product_name,
+        price,
+        size,
+        color,
+        available_stores,
+        created_at,
+        author:profiles (
+          profile_id,
+          location_name,
+          avatar,
+          role
+        )
+      `
+      )
+      .eq('post_type', 'admin_product')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`매장 상품 조회 실패: ${error.message}`);
+    }
+
+    // 클라이언트 사이드에서 해당 매장 상품만 필터링
+    const filteredPosts = (posts || [])
+      .filter((post) => {
+        if (!post.available_stores) return false;
+
+        try {
+          const stores = Array.isArray(post.available_stores)
+            ? post.available_stores
+            : JSON.parse(post.available_stores as string);
+
+          return stores.includes(storeId);
+        } catch (e) {
+          console.error('available_stores 파싱 에러:', e);
+          return false;
+        }
+      })
+      .slice(0, 10);
+
+    return { success: true, data: filteredPosts };
+  } catch (error) {
+    console.error('getStoreProducts 에러:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '매장 상품 조회 실패',
     };
   }
 }

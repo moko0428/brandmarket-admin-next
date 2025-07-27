@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { Separator } from '@/common/components/ui/separator';
-import { Grid3X3, List, Plus } from 'lucide-react';
+import { Grid3X3, List, Plus, Package, Camera } from 'lucide-react';
 import { MyPostList } from '../my-post-list';
 import { browserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ export default function PostSection() {
   const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [userId, setUserId] = useState<string>('');
   const [userRole, setUserRole] = useState<string>('user');
+  const [isBanned, setIsBanned] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,12 +28,13 @@ export default function PostSection() {
 
           const { data: profile } = await supabase
             .from('profiles')
-            .select('role')
+            .select('role, is_banned')
             .eq('profile_id', user.id)
             .single();
 
           if (profile) {
             setUserRole(profile.role);
+            setIsBanned(profile.is_banned || false);
           }
         }
       } catch (error) {
@@ -44,6 +46,56 @@ export default function PostSection() {
 
     getCurrentUser();
   }, []);
+
+  // 권한 확인
+  const isAdmin = userRole === 'admin';
+  const isManager = userRole === 'manager';
+  const canCreateProduct = isAdmin || isManager;
+
+  // 작성 버튼 렌더링
+  const renderCreateButtons = () => {
+    if (isBanned) {
+      return (
+        <div className="flex items-center gap-2">
+          <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-md">
+            <span className="text-sm text-red-600">
+              게시물 작성이 제한되었습니다
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    if (canCreateProduct) {
+      // admin/manager: 두 개의 버튼
+      return (
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/posts/create?type=photo">
+              <Camera className="w-4 h-4 mr-2" />
+              사진 게시물
+            </Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/posts/create?type=product">
+              <Package className="w-4 h-4 mr-2" />
+              상품 게시물
+            </Link>
+          </Button>
+        </div>
+      );
+    } else {
+      // 일반 user: 하나의 버튼
+      return (
+        <Button asChild size="sm">
+          <Link href="/posts/create">
+            <Plus className="w-4 h-4 mr-2" />
+            게시물 작성
+          </Link>
+        </Button>
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -64,14 +116,9 @@ export default function PostSection() {
       <div className="flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">내 포스트</h2>
-          <div className="flex items-center gap-2">
-            {/* 게시물 작성 버튼 */}
-            <Button asChild size="sm">
-              <Link href="/posts/create">
-                <Plus className="w-4 h-4 mr-2" />
-                작성
-              </Link>
-            </Button>
+          <div className="flex items-center gap-3">
+            {/* 게시물 작성 버튼들 */}
+            {renderCreateButtons()}
 
             {/* 표시 모드 토글 버튼 */}
             <div className="flex items-center border rounded-lg p-1">
