@@ -138,7 +138,7 @@ export default function EditProfileSheet({
               <div className="p-3 bg-gray-50 rounded-md">
                 <span className="text-sm">
                   {initialProfile.role === 'admin'
-                    ? '관리자'
+                    ? '점장'
                     : initialProfile.role === 'manager'
                     ? '매니저'
                     : '일반 사용자'}

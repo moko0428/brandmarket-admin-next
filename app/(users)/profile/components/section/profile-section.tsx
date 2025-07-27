@@ -71,7 +71,7 @@ export default function ProfileSection({
             <h2 className="text-lg font-semibold">{name}</h2>
             <p className="text-foreground bg-gray-100 text-xs rounded-md px-2 py-1">
               {role === 'admin'
-                ? '관리자'
+                ? '점장'
                 : role === 'manager'
                 ? '매니저'
                 : '일반'}

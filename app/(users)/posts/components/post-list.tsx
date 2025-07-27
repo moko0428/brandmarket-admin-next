@@ -219,7 +219,7 @@ export function PostList({ userRole, userId, postType }: PostListProps) {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
-                      {post.author?.location_name || '익명'}
+                      {post.author?.location_name}
                     </span>
                     <Badge
                       variant={

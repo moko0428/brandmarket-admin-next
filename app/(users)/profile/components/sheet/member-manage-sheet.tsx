@@ -38,6 +38,7 @@ import {
 import { toast } from 'sonner';
 import { Ban, Store } from 'lucide-react';
 import Image from 'next/image';
+import { browserClient } from '@/lib/supabase/client';
 
 interface ManagerStoreAssignment {
   store_id: string;
@@ -71,8 +72,13 @@ export default function MemberManageSheet({
   // 회원 목록 로드
   const loadMembers = async () => {
     setLoading(true);
+    const supabase = browserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     try {
-      const data = await getAllMembers();
+      const data = await getAllMembers({ profileId: user?.id || '' });
       setMembers(data || []);
     } catch (error) {
       console.error('회원 목록 로드 에러:', error);
@@ -206,7 +212,7 @@ export default function MemberManageSheet({
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'admin':
-        return '관리자';
+        return '점장';
       case 'manager':
         return '매니저';
       case 'user':
@@ -293,7 +299,7 @@ export default function MemberManageSheet({
                         </p>
                         {member.is_banned && (
                           <Badge variant="destructive" className="text-xs">
-                            벤됨
+                            정지
                           </Badge>
                         )}
                       </div>
@@ -322,7 +328,6 @@ export default function MemberManageSheet({
                       <SelectContent>
                         <SelectItem value="user">사용자</SelectItem>
                         <SelectItem value="manager">매니저</SelectItem>
-                        <SelectItem value="admin">관리자</SelectItem>
                       </SelectContent>
                     </Select>
 

@@ -249,7 +249,7 @@ export async function getMembers() {
 }
 
 // 모든 회원 조회 (관리자 전용)
-export async function getAllMembers() {
+export async function getAllMembers({ profileId }: { profileId: string }) {
   try {
     const supabase = await serverClient();
     await checkAdminPermission(); // 관리자 권한 확인
@@ -257,6 +257,7 @@ export async function getAllMembers() {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
+      .neq('profile_id', profileId)
       .order('createdAt', { ascending: false });
 
     if (error) {

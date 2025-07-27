@@ -93,7 +93,7 @@ export default function ProfilePage() {
 
   if (profile?.is_banned) {
     return (
-      <div className="px-10 flex flex-col">
+      <div className="px-10 flex flex-col pb-20">
         <div className="">
           <Hero title="마이페이지" subtitle="프로필을 관리할 수 있습니다." />
           <div className="mt-6 p-6 bg-red-50 border border-red-200 rounded-lg">
@@ -156,7 +156,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="px-10 flex flex-col">
+    <div className="px-10 flex flex-col pb-20">
       {/* 헤더 영역 - 고정 높이 */}
       <div className="">
         <Hero title="마이페이지" subtitle="프로필을 관리할 수 있습니다." />

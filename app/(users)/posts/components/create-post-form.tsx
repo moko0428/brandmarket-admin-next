@@ -53,9 +53,6 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
   const [stores, setStores] = useState<Store[]>([]);
   const [loadingStores, setLoadingStores] = useState(false);
 
-  // 익명 옵션 상태 추가
-  const [isAnonymous, setIsAnonymous] = useState(false);
-
   const isAdmin = userRole === 'admin';
   const isManager = userRole === 'manager';
   const canCreateProduct = isAdmin || isManager;
@@ -341,22 +338,6 @@ export function CreatePostForm({ userRole, onSuccess }: CreatePostFormProps) {
                 disabled={isSubmitting}
               />
             </div>
-
-            {/* 익명 옵션 - 사진 게시물일 때만 표시 */}
-            {!isProductPost && (
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="anonymous"
-                  checked={isAnonymous}
-                  onChange={(e) => setIsAnonymous(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <Label htmlFor="anonymous" className="text-sm font-medium">
-                  익명으로 게시하기
-                </Label>
-              </div>
-            )}
           </div>
 
           {/* 상품 정보 - 상품 게시물일 때만 표시 */}
