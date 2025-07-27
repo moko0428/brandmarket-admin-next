@@ -3,6 +3,27 @@
 import { Tables } from '@/database.types';
 import { serverClient } from '@/lib/supabase/server';
 
+// 타입 정의
+interface ManagerStoreAssignment {
+  store_id: string;
+  stores: {
+    store_id: string;
+    branch: string;
+    address: string;
+    open_time: string;
+    close_time: string;
+    latitude: string;
+    longitude: string;
+    location: string;
+    description: string;
+    store_image: string;
+    profile_id: string;
+    created_at: string;
+    updated_at: string;
+    directions: string[];
+  };
+}
+
 // 현재 인증된 사용자 확인 헬퍼 함수
 async function getCurrentUser() {
   const supabase = await serverClient();
@@ -35,6 +56,32 @@ async function checkAdminPermission() {
 
   return true;
 }
+
+// // 매니저 권한도 체크하는 함수 추가
+// async function checkManagerOrAdminPermission(profileId?: string) {
+//   const supabase = await serverClient();
+//   const user = await getCurrentUser();
+
+//   const { data: profile, error } = await supabase
+//     .from('profiles')
+//     .select('role')
+//     .eq('profile_id', user.id)
+//     .single();
+
+//   if (error) {
+//     throw new Error('사용자 정보를 가져올 수 없습니다.');
+//   }
+
+//   // 관리자이거나, 매니저이면서 자신의 정보를 조회하는 경우
+//   if (
+//     profile?.role === 'admin' ||
+//     (profile?.role === 'manager' && (!profileId || profileId === user.id))
+//   ) {
+//     return true;
+//   }
+
+//   throw new Error('권한이 없습니다.');
+// }
 
 export async function updateProfile(
   profileId: string,
@@ -251,86 +298,139 @@ export async function banMember(profileId: string, isBanned: boolean) {
   }
 }
 
-// 매니저-매장 연결
-export async function assignManagerToStore(managerId: string, storeId: string) {
-  const supabase = await serverClient();
+// 매니저-매장 연결 - 올바른 테이블명 사용
+export async function assignManagerToStore(profileId: string, storeId: string) {
+  try {
+    const supabase = await serverClient();
+    await checkAdminPermission();
 
-  const { data, error } = await supabase
-    .from('manager_store_assignments')
-    .upsert({
-      manager_id: managerId,
-      store_id: storeId,
-      assigned_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+    // 이미 할당되어 있는지 확인
+    const { data: existing } = await supabase
+      .from('branch_manager')
+      .select('id')
+      .eq('profile_id', profileId)
+      .eq('store_id', storeId)
+      .single();
 
-  if (error) {
-    console.error('매니저-매장 연결 에러:', error);
-    return { error: error.message, data: null };
+    if (existing) {
+      return { error: '이미 할당된 매장입니다.', data: null };
+    }
+
+    const { data, error } = await supabase
+      .from('branch_manager')
+      .insert({
+        profile_id: profileId,
+        store_id: storeId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('매니저-매장 연결 에러:', error);
+      return { error: error.message, data: null };
+    }
+
+    return { error: null, data };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : '매장 할당 실패';
+    console.error('assignManagerToStore 에러:', error);
+    return { error: errorMessage, data: null };
   }
-
-  return { error: null, data };
 }
 
-// 매니저-매장 연결 해제
+// 매니저-매장 연결 해제 - 올바른 테이블명 사용
 export async function unassignManagerFromStore(
-  managerId: string,
+  profileId: string,
   storeId: string
 ) {
-  const supabase = await serverClient();
+  try {
+    const supabase = await serverClient();
+    await checkAdminPermission(); // 관리자 권한 확인
 
-  const { error } = await supabase
-    .from('manager_store_assignments')
-    .delete()
-    .eq('manager_id', managerId)
-    .eq('store_id', storeId);
+    const { error } = await supabase
+      .from('branch_manager') // 올바른 테이블명
+      .delete()
+      .eq('profile_id', profileId) // profile_id 컬럼 사용
+      .eq('store_id', storeId);
 
-  if (error) {
-    console.error('매니저-매장 연결 해제 에러:', error);
-    return { error: error.message };
+    if (error) {
+      console.error('매니저-매장 연결 해제 에러:', error);
+      return { error: error.message };
+    }
+
+    return { error: null };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : '매장 할당 해제 실패';
+    console.error('unassignManagerFromStore 에러:', error);
+    return { error: errorMessage };
   }
-
-  return { error: null };
 }
 
-// 매장 목록 조회
+// 매장 목록 조회 - 수정된 버전
 export async function getStores() {
-  const supabase = await serverClient();
+  try {
+    const supabase = await serverClient();
 
-  const { data, error } = await supabase
-    .from('stores')
-    .select('*')
-    .order('name');
+    const { data, error } = await supabase
+      .from('stores')
+      .select('*')
+      .order('branch'); // 'name' 대신 'branch' 사용
 
-  if (error) {
-    console.error('매장 목록 조회 에러:', error);
-    return null;
+    if (error) {
+      console.error('매장 목록 조회 에러:', error);
+      return [];
+    }
+
+    console.log('매장 데이터 조회 결과:', data); // 디버깅용
+    return data || [];
+  } catch (error) {
+    console.error('getStores 에러:', error);
+    return [];
   }
-
-  return data;
 }
 
-// 매니저의 할당된 매장 조회
-export async function getManagerStores(managerId: string) {
-  const supabase = await serverClient();
+// 매니저의 할당된 매장 조회 - 개선된 버전
+export async function getManagerStores(
+  profileId: string
+): Promise<ManagerStoreAssignment[]> {
+  try {
+    const supabase = await serverClient();
 
-  const { data, error } = await supabase
-    .from('manager_store_assignments')
-    .select(
+    // 먼저 사용자가 매니저인지 확인
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('profile_id', profileId)
+      .single();
+
+    if (profile?.role !== 'manager') {
+      console.log('매니저가 아닌 사용자의 매장 조회 시도:', profileId);
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('branch_manager')
+      .select(
+        `
+        store_id,
+        stores (*)
       `
-      store_id,
-      stores (*)
-    `
-    )
-    .eq('manager_id', managerId);
+      )
+      .eq('profile_id', profileId);
 
-  if (error) {
-    console.error('매니저 매장 조회 에러:', error);
-    return null;
+    if (error) {
+      console.error('매니저 매장 조회 에러:', error);
+      return [];
+    }
+
+    console.log('매니저 매장 조회 결과:', data);
+    return data as unknown as ManagerStoreAssignment[];
+  } catch (error) {
+    console.error('getManagerStores 에러:', error);
+    return [];
   }
-
-  return data;
 }
 
 // 역할 업데이트 (관리자 전용)

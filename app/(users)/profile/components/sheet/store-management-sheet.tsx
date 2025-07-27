@@ -12,6 +12,7 @@ import {
   deleteStore,
   addStore,
 } from '@/app/(users)/store/action';
+import { getManagerStores } from '../../action';
 import {
   CheckIcon,
   PencilIcon,
@@ -28,6 +29,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/common/components/ui/sheet';
+import { Profile } from '../../page';
 
 // Supabase stores 테이블 타입
 interface Store {
@@ -47,10 +49,18 @@ interface Store {
   directions: string[];
 }
 
+// ManagerStoreAssignment 타입 수정
+export interface ManagerStoreAssignment {
+  store_id: string;
+  stores: Store;
+}
+
 export default function StoreManagementSheet({
+  user,
   open,
   onOpenChange,
 }: {
+  user: Profile;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -68,10 +78,26 @@ export default function StoreManagementSheet({
   // 초기 데이터 로드
   useEffect(() => {
     const loadStores = async () => {
+      if (!currentUserId) return;
+
       try {
-        const storesData = await getStores();
-        setEditedStores(storesData);
-        if (storesData.length > 0) {
+        let storesData: Store[] = [];
+
+        if (user.role === 'manager') {
+          // 매니저: 할당된 매장만 조회
+          const managerStoreAssignments = await getManagerStores(currentUserId);
+          if (managerStoreAssignments && managerStoreAssignments.length > 0) {
+            storesData = managerStoreAssignments
+              .map((assignment: ManagerStoreAssignment) => assignment.stores) // stores는 단일 객체
+              .filter(Boolean); // null 값 제거
+          }
+        } else {
+          // 어드민 및 기타: 모든 매장 조회
+          storesData = await getStores();
+        }
+
+        setEditedStores(storesData || []);
+        if (storesData && storesData.length > 0) {
           setSelectedStore(storesData[0].store_id);
         }
       } catch (error) {
@@ -82,8 +108,10 @@ export default function StoreManagementSheet({
       }
     };
 
-    loadStores();
-  }, []);
+    if (currentUserId) {
+      loadStores();
+    }
+  }, [currentUserId, user.role]);
 
   // 현재 사용자 ID 가져오기
   useEffect(() => {
@@ -146,8 +174,20 @@ export default function StoreManagementSheet({
       } else {
         toast.success('매장 정보가 저장되었습니다.');
         // 서버에서 최신 데이터 다시 로드
-        const updatedStores = await getStores();
-        setEditedStores(updatedStores);
+        if (user.role === 'manager') {
+          const managerStoreAssignments = await getManagerStores(
+            currentUserId!
+          );
+          if (managerStoreAssignments) {
+            const storesData = managerStoreAssignments
+              .map((assignment: ManagerStoreAssignment) => assignment.stores)
+              .filter(Boolean);
+            setEditedStores(storesData);
+          }
+        } else {
+          const updatedStores = await getStores();
+          setEditedStores(updatedStores);
+        }
       }
     } catch {
       toast.error('저장 중 오류가 발생했습니다.');
@@ -295,28 +335,31 @@ export default function StoreManagementSheet({
           title="매장 정보 관리"
           subtitle="매장 정보를 관리할 수 있습니다."
         />
-        <aside className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 min-h-0">
+        <aside className="grid grid-cols-1 gap-4 flex-1 min-h-0">
           <div className="flex flex-col gap-2 col-span-1">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold">매장 리스트</h2>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="border-green-500"
-                  onClick={() => setAddBranch(true)}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-red-500"
-                  onClick={() =>
-                    handleDeleteStore(selectedStoreData?.store_id || '')
-                  }
-                >
-                  <TrashIcon className="w-4 h-4" />
-                </Button>
-              </div>
+
+              {['admin'].includes(user.role) && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="border-green-500"
+                    onClick={() => setAddBranch(true)}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-red-500"
+                    onClick={() =>
+                      handleDeleteStore(selectedStoreData?.store_id || '')
+                    }
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             <Separator />
@@ -375,10 +418,10 @@ export default function StoreManagementSheet({
             </div>
           </div>
 
-          <div className="col-span-1 md:col-span-3 overflow-y-auto space-y-4">
+          <div className="col-span-1 overflow-y-auto space-y-4">
             {selectedStoreData ? (
               <div className="space-y-4 pb-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <StoreImageUploader
                     storeId={selectedStoreData.store_id}
                     currentImageUrl={selectedStoreData.store_image}
@@ -392,7 +435,7 @@ export default function StoreManagementSheet({
                     disabled={!selectedStoreData}
                   />
 
-                  <div className="flex flex-col gap-2 col-span-2">
+                  <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-2">
                       <div>
                         <Label htmlFor="name">지점 이름</Label>

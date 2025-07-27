@@ -39,14 +39,12 @@ import { toast } from 'sonner';
 import { Ban, Store } from 'lucide-react';
 import Image from 'next/image';
 
-// 타입 정의 추가 (파일 상단에)
 interface ManagerStoreAssignment {
   store_id: string;
   stores: {
     store_id: string;
     branch: string;
     address: string;
-    name?: string;
   };
 }
 
@@ -87,10 +85,16 @@ export default function MemberManageSheet({
   // 매장 목록 로드
   const loadStores = async () => {
     try {
+      console.log('매장 목록 로딩 시작...'); // 디버깅용
       const data = await getStores();
+      console.log('로드된 매장 데이터:', data); // 디버깅용
+      console.log('매장 데이터 타입:', typeof data, Array.isArray(data)); // 디버깅용
+
       setStores(data || []);
+      console.log('상태에 설정된 매장 수:', (data || []).length); // 디버깅용
     } catch (error) {
       console.error('매장 목록 로드 에러:', error);
+      toast.error('매장 목록을 불러오는데 실패했습니다.');
     }
   };
 
@@ -98,9 +102,13 @@ export default function MemberManageSheet({
   const loadManagerStores = async (managerId: string) => {
     try {
       const data = await getManagerStores(managerId);
-      setManagerStores(data as unknown as ManagerStoreAssignment[]);
+      // null이나 undefined 체크 추가
+      setManagerStores(
+        Array.isArray(data) ? (data as unknown as ManagerStoreAssignment[]) : []
+      );
     } catch (error) {
       console.error('매니저 매장 로드 에러:', error);
+      setManagerStores([]); // 에러 시 빈 배열로 설정
     }
   };
 
@@ -264,12 +272,15 @@ export default function MemberManageSheet({
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
                       {member.avatar ? (
                         <Image
                           src={member.avatar}
                           alt={member.location_name}
+                          width={40}
+                          height={40}
                           className="w-full h-full rounded-full object-cover"
+                          unoptimized // Supabase 스토리지 이미지의 경우 최적화 비활성화
                         />
                       ) : (
                         <span className="text-gray-400 text-sm">이미지</span>
@@ -354,12 +365,15 @@ export default function MemberManageSheet({
                             <div>
                               <h3 className="font-medium mb-2">할당된 매장</h3>
                               <div className="space-y-2">
-                                {managerStores.map((assignment) => (
+                                {(managerStores || []).map((assignment) => (
                                   <div
                                     key={assignment.store_id}
                                     className="flex items-center justify-between p-2 border rounded"
                                   >
-                                    <span>{assignment.stores.name}</span>
+                                    <span>
+                                      {assignment.stores?.branch ||
+                                        '매장명 없음'}
+                                    </span>
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -374,7 +388,8 @@ export default function MemberManageSheet({
                                     </Button>
                                   </div>
                                 ))}
-                                {managerStores.length === 0 && (
+                                {(!managerStores ||
+                                  managerStores.length === 0) && (
                                   <p className="text-gray-500 text-sm">
                                     할당된 매장이 없습니다.
                                   </p>
@@ -394,16 +409,27 @@ export default function MemberManageSheet({
                                   <SelectValue placeholder="매장을 선택하세요" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {stores.map((store) => (
-                                    <SelectItem
-                                      key={store.store_id}
-                                      value={store.store_id}
-                                    >
-                                      {store.branch}
+                                  {stores.length === 0 ? (
+                                    <SelectItem value="" disabled>
+                                      등록된 매장이 없습니다
                                     </SelectItem>
-                                  ))}
+                                  ) : (
+                                    stores.map((store) => (
+                                      <SelectItem
+                                        key={store.store_id}
+                                        value={store.store_id}
+                                      >
+                                        {store.branch}
+                                      </SelectItem>
+                                    ))
+                                  )}
                                 </SelectContent>
                               </Select>
+                              {stores.length === 0 && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  매장을 먼저 등록해주세요.
+                                </p>
+                              )}
                             </div>
                           </div>
                         </DialogContent>

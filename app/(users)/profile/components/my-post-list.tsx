@@ -343,11 +343,7 @@ export function MyPostList({
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <Link href={`/posts/${post.post_id}`}>
-                    <h3 className="font-medium hover:text-blue-600 transition-colors">
-                      {post.title}
-                    </h3>
-                  </Link>
+                  <h3 className="font-medium">{post.title}</h3>
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                     {post.content}
                   </p>

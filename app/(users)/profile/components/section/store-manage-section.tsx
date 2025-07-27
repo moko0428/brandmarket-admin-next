@@ -7,7 +7,7 @@ export default function StoreManageSection({
   setOpen: (open: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 border-b pb-2">
+    <div className="flex items-center justify-between gap-2 border-b py-2">
       <div className="flex items-center gap-2">
         <StoreIcon className="size-8" />
         매장 관리하기

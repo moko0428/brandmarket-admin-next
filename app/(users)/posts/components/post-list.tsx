@@ -16,6 +16,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/common/components/ui/dropdown-menu';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/common/components/ui/carousel';
 
 interface Store {
   store_id: string;
@@ -132,6 +137,54 @@ export function PostList({ userRole, userId, postType }: PostListProps) {
     return post.author_id === userId || userRole === 'admin';
   };
 
+  // 이미지 렌더링 컴포넌트
+  const renderPostImages = (post: PostWithAuthor) => {
+    if (post.images.length === 0) return null;
+
+    if (post.images.length === 1) {
+      // 단일 이미지
+      return (
+        <div className="relative">
+          <Image
+            src={post.images[0]}
+            alt={`${post.title} 이미지`}
+            width={600}
+            height={400}
+            className="w-full h-64 md:h-80 object-cover"
+          />
+        </div>
+      );
+    }
+
+    // 다중 이미지 - 캐러셀 사용
+    return (
+      <div className="relative">
+        <Carousel className="w-full">
+          <CarouselContent>
+            {post.images.map((image, index) => (
+              <CarouselItem key={index}>
+                <div className="relative">
+                  <Image
+                    src={image}
+                    alt={`${post.title} 이미지 ${index + 1}`}
+                    width={600}
+                    height={400}
+                    className="w-full h-64 md:h-80 object-cover"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          {/* 이미지 개수 표시 */}
+          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+            +{post.images.length}
+          </div>
+        </Carousel>
+      </div>
+    );
+  };
+
   if (loading && posts.length === 0) {
     return (
       <div className="flex items-center justify-center py-10">
@@ -207,36 +260,12 @@ export function PostList({ userRole, userId, postType }: PostListProps) {
               )}
             </div>
 
-            {/* 이미지 */}
-            <div className="relative">
-              {post.images.length > 0 && (
-                <div className="grid grid-cols-1 gap-1">
-                  {post.images.slice(0, 1).map((image, index) => (
-                    <Image
-                      key={index}
-                      src={image}
-                      alt={`${post.title} 이미지 ${index + 1}`}
-                      width={600}
-                      height={400}
-                      className="w-full h-64 md:h-80 object-cover"
-                    />
-                  ))}
-                  {post.images.length > 1 && (
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-                      +{post.images.length - 1}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* 이미지 - 캐러셀로 교체 */}
+            {renderPostImages(post)}
 
             {/* 내용 */}
             <div className="p-4">
-              <Link href={`/posts/${post.post_id}`}>
-                <h3 className="font-bold text-lg mb-2 hover:text-blue-600 transition-colors">
-                  {post.title}
-                </h3>
-              </Link>
+              <h3 className="font-bold text-lg mb-2">{post.title}</h3>
 
               {post.content && (
                 <p className="text-gray-700 mb-3 line-clamp-3">
